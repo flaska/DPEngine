@@ -79,7 +79,7 @@ private:
 	DicomImage *iDicomImage;
 	TDicomImagesInfo iImagesInfo;
 public:
-	quint16* iData; 
+	quint8* iData; 
 public:
 	static const float iWindowMultiplyFactor;
 };

@@ -36,44 +36,23 @@ CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &
 	iImageWindow.center=int((iImageWindow.center )/CDicomFrames::iWindowMultiplyFactor);
 	iImageWindow.width=int((iImageWindow.width )/CDicomFrames::iWindowMultiplyFactor);
 	//PrepareActualTexture();
-	//TODO: prekreslit snimek v workspace kemo
-	
-	
-	//iImage = new QImage("im.pgm");
-	//iImage = new QImage((uchar*)iTexture->iFrames->GetImageData(),iTexture->iFrames->GetWidth(),iTexture->iFrames->GetHeight(),/*16,*/QImage::Format_ARGB32);
 
-quint16* qi = (quint16*)iTexture->iFrames->GetImageData();
-uchar * qu = (uchar*)qi;
-QImage *img = new QImage(qu, iTexture->iFrames->GetWidth(), iTexture->iFrames->GetHeight(), 2*iTexture->iFrames->GetWidth(), QImage::Format_Indexed8);
-QLabel *l = new QLabel();
-QPixmap *pix = new QPixmap(2,2);
-pix->convertFromImage(*img);
-l->setPixmap(*pix); 
-l->show();
-
-
-/*uchar pixDataRGB[] = {255, 0, 0, 0, 0, 255, 0, 0, 255, 255, 0, 0};
-QImage *img = new QImage(pixDataRGB, 2, 2, 6, QImage::Format_RGB888);
-QImage scaled = img->scaled(100, 100);
-QLabel *l = new QLabel();
-QPixmap *pix = new QPixmap(2,2);
-pix->convertFromImage(scaled);
-l->setPixmap(*pix); 
-l->show();*/
-
-
-	
-	
-		/*uchar * data = new uchar();
-		for (int y=0;y<10;y++)
-			for (int x; x<10; x++)
-				data[y*10+x]=x+y;
-		iImage = new QImage(data,10,10,10,QImage::Format_ARGB32);
-		QLabel *l;
-		QPixmap *pix;
-		pix->convertFromImage(*iImage);
-		l->setPixmap(*pix);
-		l->show();*/
+/*	quint16* qi = (quint16*)iTexture->iFrames->GetImageData();
+	uchar * qu = (uchar*)qi;
+	QImage *img = new QImage(qu, iTexture->iFrames->GetWidth(), iTexture->iFrames->GetHeight(), 2*iTexture->iFrames->GetWidth(), QImage::Format_RGB16);
+	QLabel *l = new QLabel();
+	QPixmap *pix = new QPixmap(iTexture->iFrames->GetWidth(),iTexture->iFrames->GetHeight());
+	pix->convertFromImage(*img);
+	l->setPixmap(*pix); 
+	l->show();		*/
+	quint8* qi = (quint8*)iTexture->iFrames->GetImageData();
+	uchar * qu = (uchar*)qi;
+	QImage *img = new QImage(qu, iTexture->iFrames->GetWidth(), iTexture->iFrames->GetHeight(), iTexture->iFrames->GetWidth(), QImage::Format_Indexed8);
+	QLabel *l = new QLabel();
+	QPixmap *pix = new QPixmap(iTexture->iFrames->GetWidth(),iTexture->iFrames->GetHeight());
+	pix->convertFromImage(*img);
+	l->setPixmap(*pix); 
+	l->show();		
 }
 
 void CImage::SetGeometry(float x, float y, float width, float height)

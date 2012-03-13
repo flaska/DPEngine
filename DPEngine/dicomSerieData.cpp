@@ -272,9 +272,9 @@ tryReadDicomImage://Label for goto
 	}
 	//prepare buffer for image data output ( 16 bits)
 	//TODO solve
-	const unsigned long size = iDicomImage->getOutputDataSize(16);;
+	const unsigned long size = iDicomImage->getOutputDataSize(8);;
 	//number of unsigned ints to allocate
-	iImagesInfo.frameQuintsCount = size / sizeof(quint16);
+	iImagesInfo.frameQuintsCount = size / sizeof(quint8);
 	if (isFirst)
 	{//perform allocation only once
 		iImagesInfo.frameSize = size;
@@ -282,7 +282,7 @@ tryReadDicomImage://Label for goto
 			delete iData;
 		//framesCount = 512;
 		//TODO handle huge numbger of frames // can not allocate
-		iData = new quint16[iImagesInfo.frameQuintsCount * framesCount];
+		iData = new quint8[iImagesInfo.frameQuintsCount * framesCount];
 	}
 	else
 	{//check image size for compatibility
@@ -322,8 +322,8 @@ tryReadDicomImage://Label for goto
 		}
 	}
 	iDicomImage->setWindow(iImagesInfo.window.center,iImagesInfo.window.width);
-	quint16 *target = iData+(iImagesInfo.frameQuintsCount*iImagesInfo.framesCount);
-	iDicomImage->getOutputData(target,size,16);
+	quint8 *target = iData+(iImagesInfo.frameQuintsCount*iImagesInfo.framesCount);
+	iDicomImage->getOutputData(target,size,8);
 	iImagesInfo.framesCount++;
 
 	//delete image object - data are stored separatedly
@@ -436,7 +436,7 @@ void CDicomFrames::PerformImageInputDataProcessing()
 			//iData[i] -= 32767;
 			//iData[i] *= 16;
 		}
-		quint16 a=iData[i];
+		quint8 a=iData[i];
 		if(a!=-32768)
 		{
 			a=a;
