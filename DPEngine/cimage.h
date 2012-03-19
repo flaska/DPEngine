@@ -11,6 +11,13 @@ typedef enum
 	EImageOrientationCoronal = 2//zleva doprava
 }TImageAxisOrientation;
 
+typedef enum{
+	EManipNone,
+	EManipAllowed,
+	EManipDissalowed
+}
+TManipulationState;
+
 class CWorkspace;
 class CImage : public CObject{
 public:
@@ -21,6 +28,11 @@ public:
 	void SetGeometry(float x, float y, float width, float height);
 	void DrawImage();
 	void Init(CObject *parentWindow, QPointF& position, QPointF &size);
+	CDicom3DTexture *GetTexture();
+	void SetZoom(float zoom);
+	void SetManipulated(TManipulationState manipulated);
+	void mousePressEvent(QMouseEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
 private:
 	QImage* iImage;
 	CWorkspace* iParentWorkspace;
@@ -46,5 +58,7 @@ private:
 	QPoint iLockedGlobalMousePosition;
 	QPointF iLockedSize ;
 	QPointF iLockedPosition ;
+	TManipulationState iManipulated;
+	TMouseState iMouseState;
 };
 #endif

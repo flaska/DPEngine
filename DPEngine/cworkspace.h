@@ -14,9 +14,13 @@ public:
 	void addImage(CImage* im);
 	QList<CImage*>& GetImages();
 	void paint();
+	void mousePressEvent(QMouseEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
+	MWorkspaceLayout &GetLayout();
 //private:
 	QImage* iWorkspaceImage;
 	QList<CImage*> iImages;
 	MWorkspaceLayout *iLayout;
+	CImage *iActiveImage;
 };
 #endif

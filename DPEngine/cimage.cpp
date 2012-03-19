@@ -37,22 +37,16 @@ CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &
 	iImageWindow.width=int((iImageWindow.width )/CDicomFrames::iWindowMultiplyFactor);
 	//PrepareActualTexture();
 
-/*	quint16* qi = (quint16*)iTexture->iFrames->GetImageData();
-	uchar * qu = (uchar*)qi;
-	QImage *img = new QImage(qu, iTexture->iFrames->GetWidth(), iTexture->iFrames->GetHeight(), 2*iTexture->iFrames->GetWidth(), QImage::Format_RGB16);
-	QLabel *l = new QLabel();
-	QPixmap *pix = new QPixmap(iTexture->iFrames->GetWidth(),iTexture->iFrames->GetHeight());
-	pix->convertFromImage(*img);
-	l->setPixmap(*pix); 
-	l->show();		*/
 	quint8* qi = (quint8*)iTexture->iFrames->GetImageData();
 	uchar * qu = (uchar*)qi;
-	QImage *img = new QImage(qu, iTexture->iFrames->GetWidth(), iTexture->iFrames->GetHeight(), iTexture->iFrames->GetWidth(), QImage::Format_Indexed8);
-	QLabel *l = new QLabel();
-	QPixmap *pix = new QPixmap(iTexture->iFrames->GetWidth(),iTexture->iFrames->GetHeight());
-	pix->convertFromImage(*img);
-	l->setPixmap(*pix); 
-	l->show();		
+	iImage = new QImage(qu, iTexture->iFrames->GetWidth(), iTexture->iFrames->GetHeight(), iTexture->iFrames->GetWidth(), QImage::Format_Indexed8);	
+
+	 QPainter painter;
+	 painter.begin(iImage);
+     painter.setPen(QColor(255,255,255));
+	 painter.drawRect(5,5,10,10);
+	 painter.end();
+
 }
 
 void CImage::SetGeometry(float x, float y, float width, float height)
@@ -124,7 +118,7 @@ void CImage::Init(CObject *parentWindow, QPointF& position, QPointF &size )
 	name.clear();
 	name.append("image");
 //TODO	SetName(name);
-//TODO	iManipulated = EManipNone;
+	iManipulated = EManipNone;
 //TODO	CWidget::GetInstance()->makeCurrent();
 //TODO	iOwner = NULL;
 	iParentWorkspace=NULL;
@@ -162,4 +156,197 @@ void CImage::Init(CObject *parentWindow, QPointF& position, QPointF &size )
 //TODO	SetTextDisplay(EDisplayTextOrientation, true);
 //TODO	SetTextDisplay(EDisplayTextWindow, true);
 //TODO	SetTextDisplay(EDisplayTextZoom, false);
+}
+
+void CImage::SetZoom(float zoom)
+{
+	iZoomFactor=zoom;
+	if(iParentWorkspace)
+	{
+		//iLayout->PrepareImageToMove(iActiveImage);
+		//TODO iParentWorkspace->UpdateTexture();
+	}
+	//TODO CWidget::GetInstance()->paint();
+}
+
+CDicom3DTexture *CImage::GetTexture()
+{
+	return iTexture;
+}
+
+void CImage::SetManipulated(TManipulationState manipulated)
+{
+
+	iManipulated=manipulated;
+}
+
+void CImage::mousePressEvent(QMouseEvent *event)
+{
+	//iSkipMouseMovement = false;
+	iMouseState = EMouseStateNone;
+	//locked states
+	iLockedGlobalMousePosition = event->globalPos();
+	//Save previous object state
+	iLockedSize = iSize;
+	iLockedPosition = iPosition;
+	iLockedImageCenter = iImageCenter;
+	iLockedZoom=iZoomFactor;
+	int x=event->x() - iPosition.x();
+	int y = event->y()- iPosition.y();
+	iPreviousMousePosition = QPoint(x, y);	
+
+
+	if(IsOnResizeIcon(x, y))
+	{
+		iMouseState=EMouseStateObjectResizing;
+		if(iParentWorkspace)
+		{
+			iParentWorkspace->GetLayout().PrepareImageToResize(this);
+		}
+		iManipulated=EManipAllowed;
+
+		return;		
+	}
+	if(IsOnMoveIcon(x, y))
+	{
+		iMouseState=EMouseStateObjectMoving;
+		if(iParentWorkspace)
+		{
+			iParentWorkspace->GetLayout().PrepareImageToMove(this);
+		}
+
+		//iManipulated=true;
+
+		return;
+
+	}
+//TODO 
+/*	if(IsOnCloseIcon(x, y))
+	{
+		CloseMe();
+		delete this;
+		return;
+
+	}
+	if(IsOnFrameSliderIcon(x, y))
+	{
+		iMouseState=EMouseStateFrameSliderChanging;
+		return;		
+	}
+
+	if(event->button() == Qt::LeftButton )
+	{
+		iMouseState = EMouseStateImageMoving;
+
+		return;
+	}
+
+	if(event->button() == Qt::MidButton )
+	{
+		iMouseState = EMouseStateImageZooming;
+	}
+
+	if(event->button() == Qt::RightButton  )
+	{
+		iMouseState = EMouseStateImageWindowLeveling;
+	}
+*/
+}
+
+void CImage::mouseMoveEvent(QMouseEvent *event)
+{
+	int x=event->x() - iPosition.x();
+	int y = event->y()- iPosition.y();
+	int dx = x-iPreviousMousePosition.x();
+	int dy = y-iPreviousMousePosition.y();
+//TODO
+/*
+	if(EMouseStateImageWindowLeveling==iMouseState)
+	{
+		QCursor::setPos(iLockedGlobalMousePosition);
+		//iScale *=(1.+(float)dx/50.);
+		//iBias *=(1.+(float)dy/100.);
+		iImageWindow.center+=4*dy;
+		if(iImageWindow.center>65596)
+			iImageWindow.center = 65096;
+		//if(iImageWindow.center<0)
+		//	iImageWindow.center = 0;
+		iImageWindow.width+=4*dx;
+		if(iImageWindow.width>65096)
+			iImageWindow.width = 65096;
+		if(iImageWindow.width<1)
+			iImageWindow.width = 1;
+
+		SetImageWindow(iImageWindow);
+		return;
+	}
+	else if(iMouseState == EMouseStateFrameSliderChanging )
+	{
+		QCursor::setPos(event->globalPos().x(),iLockedGlobalMousePosition.y());
+		IsOnFrameSliderIcon (x,y);
+
+		return;
+	}
+	else if(iMouseState == EMouseStateImageZooming)
+	{
+		QCursor::setPos(iLockedGlobalMousePosition);
+		SetZoom(iZoomFactor*(1.-(float)dy/100.));
+		iImageCenter.setX((x-(x-iLockedImageCenter.x()*iSize.x())*(iZoomFactor/iLockedZoom))/iSize.x());
+		iImageCenter.setY((y-(y-iLockedImageCenter.y()*iSize.y())*(iZoomFactor/iLockedZoom))/iSize.y());
+		
+		return;
+	}
+	else 
+	
+	if(iMouseState == EMouseStateImageMoving)
+	{
+		iImageCenter.setX(iImageCenter.x()+(float)dx/iSize.x());
+		iImageCenter.setY(iImageCenter.y()+(float)dy/iSize.y());
+		if(iParentWorkspace)
+		{
+			//iParentWorkspace->UpdateTexture();
+		}
+		//CGLWidget::GetInstance()->updateGL ();
+		//return;
+	}
+	//TODO
+	
+	else */
+	if(iMouseState == EMouseStateObjectMoving)
+	{
+		dx=event->globalPos().x()-iLockedGlobalMousePosition.x();
+		dy=event->globalPos().y()-iLockedGlobalMousePosition.y();
+
+		SetGeometry(iLockedPosition.x()+dx,
+			iLockedPosition.y()+dy ,
+			iSize.x(),
+			iSize.y());
+		if(iParentWorkspace)
+		{
+			iParentWorkspace->GetLayout().ImageMoved(this);
+		}
+		CWidget::GetInstance()->paint();
+		//TODO CGLWidget::GetInstance()->updateGL ();
+		//return; //to avoid updating of previous mouse position
+	}/*
+	else if(iMouseState == EMouseStateObjectResizing)
+	{
+
+		dx=event->globalPos().x()-iLockedGlobalMousePosition.x();
+		dy=event->globalPos().y()-iLockedGlobalMousePosition.y();
+		SetGeometry(iPosition.x(),iPosition.y(),
+			iLockedSize.x()+dx,
+			iLockedSize.y()+dy);
+		//iPreviousMousePosition = QPoint(iSize.x(), iSize.y());
+		if(iParentWorkspace)
+		{
+			iParentWorkspace->GetLayout().ImageResized(this);
+		}
+		CGLWidget::GetInstance()->updateGL ();
+		//return;
+
+	}
+	iPreviousMousePosition = QPoint(x, y);	
+	//iPreviousGlobalMousePosition = event->globalPos();
+	*/
 }

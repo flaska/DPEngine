@@ -109,8 +109,7 @@ void CGrowingGridLayout::Do()
 			{
 				im=images.next();
 				iImageGrid[i][j]=im;
-	//TODO			float zoom = (float)iParentWorkspace->GetSize().x()/(float)im->GetTexture()->GetWidth();
-				int zoom = 1;
+				float zoom = (float)iParentWorkspace->GetSize().x()/(float)im->GetTexture()->GetWidth();
 				zoom/=iColumnCount;
 				im->SetPosition(QPoint(
 					iColumnLefts[i],
@@ -268,10 +267,9 @@ bool CGrowingGridLayout::PrepareNewImageGeometry(CImage *image)
 					im=images.next();
 
 					iImageGrid[i][j]=im;
-//TODO					float zoom = (float)defaultSize.x()/(float)im->GetTexture()->GetWidth();
-int zoom =1;
+					float zoom = (float)defaultSize.x()/(float)im->GetTexture()->GetWidth();
 					zoom/=iColumnCount;
-					//im->SetZoom(zoom);
+					im->SetZoom(zoom);
 					im->SetPosition(QPoint(
 						iColumnLefts[i],
 						iRowsTops[j]));
@@ -301,10 +299,10 @@ int zoom =1;
 				im->SetPosition(defaultPosition);
 				im->SetSize(defaultSize);
 				iImageGrid[i][j]=im;
-//TODO				float zoom = (float)iParentWorkspace->GetSize().x()/(float)im->GetTexture()->GetWidth();
-int zoom = 1;
+				float zoom = (float)iParentWorkspace->GetSize().x()/(float)im->GetTexture()->GetWidth();
+
 				zoom/=iColumnCount;
-				//	im->SetZoom(zoom);
+				im->SetZoom(zoom);
 				goto lblImageAdded;
 			}
 
@@ -488,7 +486,7 @@ void CGrowingGridLayout::ImageMoved(CImage *image)
 		im=images.next();
 		if((im!=image) && (im->GetPosition()==image->GetPosition()))
 		{
-//TODO			im->SetManipulated(EManipAllowed);
+			im->SetManipulated(EManipAllowed);
 			iSwappedImage=im;
 			gridToPos = FindGridPosition(im);
 			break;
@@ -504,7 +502,7 @@ void CGrowingGridLayout::ImageMoved(CImage *image)
 	//swap
 	if(gridToPos.x()!=-1 && gridToPos != gridFromPos)
 	{
-//TODO		image->SetManipulated(EManipAllowed);
+		image->SetManipulated(EManipAllowed);
 		iToSwap=true;
 		iImageGrid[gridToPos.x()][gridToPos.y()]=image;
 		iImageGrid[gridFromPos.x()][gridFromPos.y()]=iSwappedImage;

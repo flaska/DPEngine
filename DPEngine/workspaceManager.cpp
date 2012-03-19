@@ -2,13 +2,14 @@
 #include <cwidget.h>
 //#include <glWorkspaceSnapshot.h>
 CWorkspaceManager* CWorkspaceManager::instance = NULL;
-/*
-CGLObject* CWorkspaceManager::iParent = NULL;
-CWorkspaceManager::CWorkspaceManager(CGLObject *parent)
+
+//CObject* CWorkspaceManager::iParent = NULL;
+CWorkspaceManager::CWorkspaceManager(/*CObject *parent*/)
 {
 	iActiveWorkspace = NULL;
-	iPlanarWorkspace = NULL;
+	//iPlanarWorkspace = NULL;
 }
+/*
 CWorkspaceManager::~CWorkspaceManager()
 {
 	instance = NULL;
@@ -111,8 +112,8 @@ bool CWorkspaceManager::PlanarWorkspaceExists(){
 	if(iPlanarWorkspace!=NULL)
 		return true;
 }
-*/
 
+*/
 CWorkspaceManager* CWorkspaceManager::GetInstance()
 {
 	return instance;

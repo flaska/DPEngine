@@ -15,7 +15,7 @@ public:
 	//~CWorkspaceManager();
 private:
 	//CWorkspaceManager(CGLObject *parent);
-
+	CWorkspaceManager();
 	
 public:
 	//static CWorkspaceManager* InitInstance(CGLObject *parent = NULL);
