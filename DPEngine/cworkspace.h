@@ -22,5 +22,6 @@ public:
 	QList<CImage*> iImages;
 	MWorkspaceLayout *iLayout;
 	CImage *iActiveImage;
+	CImage *iDrawedImage;
 };
 #endif

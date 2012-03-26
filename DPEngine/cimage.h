@@ -33,6 +33,7 @@ public:
 	void SetManipulated(TManipulationState manipulated);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
+
 private:
 	QImage* iImage;
 	CWorkspace* iParentWorkspace;

@@ -40,12 +40,15 @@ QList<CImage*>& CWorkspace::GetImages()
 void CWorkspace::paint(){
 	iWorkspaceImage->fill(Qt::black);
 	QListIterator<CImage*> images(iImages);
+	QPainter painter((QPaintDevice*)iWorkspaceImage);
+	QImage img;
 	while (images.hasNext()){
-		CImage *im = images.next();
-		QPainter painter((QPaintDevice*)iWorkspaceImage);
-		QImage img(im->getImage()->convertToFormat(QImage::Format_RGB32));
+		iDrawedImage = images.next();
+		img = iDrawedImage->getImage()->convertToFormat(QImage::Format_RGB32);
 		//painter.drawImage(QRect(QPoint(im->GetPosition().x(),im->GetPosition().y()),QPoint(im->GetPosition().x()+im->GetSize().x(),im->GetPosition().y()+im->GetSize().y())),img);	
-		painter.drawImage(QRect(QPoint(im->GetPosition().x(),im->GetPosition().y()),QPoint(im->GetPosition().x()+im->GetSize().x(),im->GetPosition().y()+im->GetSize().y())),img);
+		painter.drawImage(QRect(QPoint(iDrawedImage->GetPosition().x(),iDrawedImage->GetPosition().y()),QPoint(iDrawedImage->GetPosition().x()+iDrawedImage->GetSize().x(),iDrawedImage->GetPosition().y()+iDrawedImage->GetSize().y())),img);
+		iDrawedImage->DrawInnerRect(&painter);
+		iDrawedImage->DrawIcons(&painter);
 	}
 }
 

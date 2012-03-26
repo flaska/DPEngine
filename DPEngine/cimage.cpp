@@ -41,12 +41,6 @@ CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &
 	uchar * qu = (uchar*)qi;
 	iImage = new QImage(qu, iTexture->iFrames->GetWidth(), iTexture->iFrames->GetHeight(), iTexture->iFrames->GetWidth(), QImage::Format_Indexed8);	
 
-	 QPainter painter;
-	 painter.begin(iImage);
-     painter.setPen(QColor(255,255,255));
-	 painter.drawRect(5,5,10,10);
-	 painter.end();
-
 }
 
 void CImage::SetGeometry(float x, float y, float width, float height)

@@ -131,8 +131,8 @@ public:
 	void SetBorderColor(TColor color);
 	TColor GetBorderColor();
 	void DrawBorderRect();
-	void DrawInnerRect();
-	void DrawIcons();
+	void DrawInnerRect(QPainter*);
+	void DrawIcons(QPainter*);
 	void SetInnerColor(float r, float g, float b, float alpha);
 	void SetInnerColor(TColor color);
 	TColor GetInnerColor();

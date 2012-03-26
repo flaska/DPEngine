@@ -20,8 +20,8 @@ CObject::CObject(CObject *parentWindow, const QPointF& position, const QPointF &
 	
 	iMoveIcon.position.setX(0);
 	iMoveIcon.position.setY(0);
-	iMoveIcon.size.setX(20);
-	iMoveIcon.size.setY(20);
+	iMoveIcon.size.setX(50);
+	iMoveIcon.size.setY(50);
 
 	iResizeIcon.size.setX(20);
 	iResizeIcon.size.setY(20);
@@ -59,7 +59,7 @@ void CObject::resizeGL()
 }
 */
 
-void CObject::DrawInnerRect()
+void CObject::DrawInnerRect(QPainter* painter)
 {
 
 	//glColor4f(iInnerColor.r,iInnerColor.g,iInnerColor.b,iInnerColor.a);
@@ -74,6 +74,11 @@ void CObject::DrawInnerRect()
 		right,
 		top);*/
 	//TODO: nakreslit obdelnik woe
+	painter->setPen(QPen(QColor(255,0,0)));
+	painter->drawLine(10,10,20,20);
+	QPointF position = GetPosition();
+	QPointF size = GetSize();
+	painter->drawRect(QRect(position.toPoint(),QSize(size.x(),size.y())));
 }
 void CObject::SetInnerColor(TColor color)
 {
@@ -93,7 +98,7 @@ TColor CObject::GetInnerColor()
 
 
 
-void CObject::DrawIcons()
+void CObject::DrawIcons(QPainter* painter)
 {
 //	glEnable(GL_BLEND);
 	float opaq = 0.5;
@@ -121,6 +126,10 @@ void CObject::DrawIcons()
 		glVertex2d(iMoveIcon.position.x(),iSize.y()-iMoveIcon.position.y());
 		glEnd();
 		glDisable(GL_TEXTURE_2D);*/
+		painter->setPen(QPen(QColor(255,0,0)));
+		QPoint position(iMoveIcon.position.x()+GetPosition().x()+20,iMoveIcon.position.y()+GetPosition().y()+100);
+		painter->drawRect(QRect(position,QSize(10,10)));
+
 	}
 	//Resize icon
 	if(iResizeAbility )
@@ -143,6 +152,7 @@ void CObject::DrawIcons()
 		glEnd();
 
 		glDisable(GL_TEXTURE_2D);*/
+		
 	}
 	//Close icon
 	if(iCloseAbility )
