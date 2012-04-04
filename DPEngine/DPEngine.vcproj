@@ -124,7 +124,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib Netapi32.lib WS2_32.lib QtCore.lib QtGui.lib oflog.lib ofstd.lib dcmdata.lib dcmimgle.lib dcmimage.lib ijg8.lib ijg12.lib ijg16.lib dcmjpeg.lib dcmnet.lib dcmdsig.lib dcmsr.lib dcmtls.lib dcmpstat.lib dcmwlm.lib dicom3DTexture.lib dicom3DTextureManager.lib dicomSerieData.lib dicomHeader.lib settings.lib cobject.lib cwidget.lib cimage.lib cworkspace.lib workspaceManager.lib freelayout.lib growinggridlayout.lib workspacelayout.lib"
+				AdditionalDependencies="kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib Netapi32.lib WS2_32.lib QtCore.lib QtGui.lib oflog.lib ofstd.lib dcmdata.lib dcmimgle.lib dcmimage.lib ijg8.lib ijg12.lib ijg16.lib dcmjpeg.lib dcmnet.lib dcmdsig.lib dcmsr.lib dcmtls.lib dcmpstat.lib dcmwlm.lib dicom3DTexture.lib dicom3DTextureManager.lib dicomSerieData.lib dicomHeader.lib settings.lib cobject.lib cwidget.lib cimage.lib cworkspace.lib workspaceManager.lib freelayout.lib growinggridlayout.lib workspacelayout.lib cimageexplorer.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				AdditionalLibraryDirectories="s:\dp\lib.d\Qt\lib;s:\DP\LIB.D\dcmtk\lib;S:\Diplomka.Examples\DPEngine\Debug"
 				GenerateDebugInformation="true"

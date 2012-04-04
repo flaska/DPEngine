@@ -35,7 +35,7 @@ bool CFreeLayout::PrepareNewImageGeometry(CImage *image)
 	}
 
 
-	if(image->GetSize().x() > iParentWorkspace->GetSize().x())
+	//if(image->GetSize().x() > iParentWorkspace->GetSize().x())
 	{
 		image->SetGeometry(image->GetPosition().x(),
 			image->GetPosition().y(),

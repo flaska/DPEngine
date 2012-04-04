@@ -3,6 +3,7 @@
 #include <dicom3dtexture.h>
 #include <dicom3DTextureManager.h>
 #include <settings.h>
+#include <cimageexplorer.h>
 void CImage::setImageFromFile(QString filename){
 	iImage = new QImage(filename);
 }
@@ -39,8 +40,35 @@ CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &
 
 	quint8* qi = (quint8*)iTexture->iFrames->GetImageData();
 	uchar * qu = (uchar*)qi;
-	iImage = new QImage(qu, iTexture->iFrames->GetWidth(), iTexture->iFrames->GetHeight(), iTexture->iFrames->GetWidth(), QImage::Format_Indexed8);	
+	QImage img = QImage(qu, iTexture->iFrames->GetWidth(), iTexture->iFrames->GetHeight(), iTexture->iFrames->GetWidth(), QImage::Format_Indexed8);	
+	iImage = new QImage(img.convertToFormat(QImage::Format_RGB32)); 
 
+}
+
+CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position, QPointF &size ):CObject(parentWindow,position,size)
+{	
+	if(!texture)
+	{
+//TODO		throw DicomFramesException();
+	}
+	iTexture= texture;
+	if(!iTexture)
+	{
+		//TODO throw TextureNotCreatedException(); 
+	}
+	Init(parentWindow, position, size);
+	iImageWindow = iTexture->GetWindowDefaults();
+	/* //TODO if(!InitSliceTexture())
+	{
+		int err=1;
+	}*/
+	iImageWindow.center=int((iImageWindow.center )/CDicomFrames::iWindowMultiplyFactor);
+	iImageWindow.width=int((iImageWindow.width )/CDicomFrames::iWindowMultiplyFactor);
+	//PrepareActualTexture();
+
+	quint8* qi = (quint8*)iTexture->iFrames->GetImageData();
+	uchar * qu = (uchar*)qi;
+	iImage = new QImage(qu, iTexture->iFrames->GetWidth(), iTexture->iFrames->GetHeight(), iTexture->iFrames->GetWidth(), QImage::Format_Indexed8);
 }
 
 void CImage::SetGeometry(float x, float y, float width, float height)
@@ -75,7 +103,7 @@ void CImage::SetGeometry(float x, float y, float width, float height)
 	{
 		//TODO iParentWorkspace->UpdateTexture();
 	}
-	//resizeGL();
+	resizeObject();
 }
 
 void CImage::DrawImage(){
@@ -214,37 +242,53 @@ void CImage::mousePressEvent(QMouseEvent *event)
 		return;
 
 	}
-//TODO 
-/*	if(IsOnCloseIcon(x, y))
+
+	if(IsOnCloseIcon(x, y))
 	{
 		CloseMe();
 		delete this;
 		return;
 
 	}
+	/* //TODO 
 	if(IsOnFrameSliderIcon(x, y))
 	{
 		iMouseState=EMouseStateFrameSliderChanging;
 		return;		
 	}
-
-	if(event->button() == Qt::LeftButton )
+*/
+	/*if(event->button() == Qt::LeftButton )
 	{
 		iMouseState = EMouseStateImageMoving;
-
 		return;
 	}
 
 	if(event->button() == Qt::MidButton )
 	{
 		iMouseState = EMouseStateImageZooming;
-	}
-
+	}*/
 	if(event->button() == Qt::RightButton  )
 	{
 		iMouseState = EMouseStateImageWindowLeveling;
 	}
-*/
+
+}
+
+void CImage::SetImageWindow(TImageWindow window)
+{
+	iImageWindow = window;
+	//PrepareActualTexture();
+	if(iParentWorkspace)
+	{
+		//iParentWorkspace->UpdateTexture();
+		std::cout << iImageWindow.center;
+	}
+	CWidget::GetInstance()->paint();
+}
+
+TImageWindow CImage::GetImageWindow()
+{
+	return iImageWindow;
 }
 
 void CImage::mouseMoveEvent(QMouseEvent *event)
@@ -253,27 +297,22 @@ void CImage::mouseMoveEvent(QMouseEvent *event)
 	int y = event->y()- iPosition.y();
 	int dx = x-iPreviousMousePosition.x();
 	int dy = y-iPreviousMousePosition.y();
-//TODO
-/*
+
 	if(EMouseStateImageWindowLeveling==iMouseState)
 	{
 		QCursor::setPos(iLockedGlobalMousePosition);
-		//iScale *=(1.+(float)dx/50.);
-		//iBias *=(1.+(float)dy/100.);
 		iImageWindow.center+=4*dy;
 		if(iImageWindow.center>65596)
 			iImageWindow.center = 65096;
-		//if(iImageWindow.center<0)
-		//	iImageWindow.center = 0;
 		iImageWindow.width+=4*dx;
 		if(iImageWindow.width>65096)
 			iImageWindow.width = 65096;
 		if(iImageWindow.width<1)
 			iImageWindow.width = 1;
-
 		SetImageWindow(iImageWindow);
 		return;
 	}
+	/*
 	else if(iMouseState == EMouseStateFrameSliderChanging )
 	{
 		QCursor::setPos(event->globalPos().x(),iLockedGlobalMousePosition.y());
@@ -319,10 +358,9 @@ void CImage::mouseMoveEvent(QMouseEvent *event)
 		{
 			iParentWorkspace->GetLayout().ImageMoved(this);
 		}
-		CWidget::GetInstance()->paint();
 		//TODO CGLWidget::GetInstance()->updateGL ();
 		//return; //to avoid updating of previous mouse position
-	}/*
+	}
 	else if(iMouseState == EMouseStateObjectResizing)
 	{
 
@@ -336,11 +374,115 @@ void CImage::mouseMoveEvent(QMouseEvent *event)
 		{
 			iParentWorkspace->GetLayout().ImageResized(this);
 		}
-		CGLWidget::GetInstance()->updateGL ();
+		//CGLWidget::GetInstance()->updateGL ();
 		//return;
 
-	}
+	}/*
 	iPreviousMousePosition = QPoint(x, y);	
 	//iPreviousGlobalMousePosition = event->globalPos();
 	*/
+	CWidget::GetInstance()->paint();
+}
+
+CImage* CImage::CreateDerivedImage(/*TImageAxisOrientation orientation*/)
+{
+/*TODO	if(!CWorkspaceManager::GetInstance()->GetActiveWorkspace())
+	{
+		QMessageBox msgBox(QMessageBox::Warning, QObject::tr("QMessageBox::warning()"),
+		QString("No active workspace to add image to"), 0, MainWindow::iSelfS);
+		msgBox.addButton(QObject::tr("&Continue"), QMessageBox::RejectRole);
+		msgBox.exec();
+		return NULL;
+	}*/
+	QPointF pos(2,2);
+	QPointF size(iSize.x(), iSize.y());
+	CImage *newImage;
+//	try
+//	{
+		newImage = new CImage(NULL/*CWorkspaceManager::GetInstance()->GetActiveWorkspace()*/,
+			C3DTextureManager::GetInstance()->GetTexture(this->GetTexture()->GetIdentificationString()),pos,size);
+//	}
+/*TODO	catch(DicomFramesException &e)
+	{
+		QMessageBox msgBox(QMessageBox::Warning, QObject::tr("QMessageBox::warning()"),
+			QString("Could not allocate texture"), 0, MainWindow::iSelfS);
+		msgBox.addButton(QObject::tr("&Continue"), QMessageBox::RejectRole);
+		msgBox.exec();
+		ImLog.write("End: *CGLImage::CreateDerivedImage");
+		return NULL;
+
+	}*/
+	CWidget::GetInstance()->paint();
+	newImage->SetOwner(this);
+	QString name("Im:");
+	//TODOname.append(QString::number(iDerivedImages.count()));
+	//newImage->SetName(name);
+	//iDerivedImages.append(newImage);
+	//newImage->SetOrientation(orientation);
+	return newImage;
+}
+
+CImage *CImage::GetOwner(){
+	return iOwner;
+}
+
+void CImage::SetOwner(CImage *owner){
+	iOwner=owner;
+}
+
+void CImage::CloseMe()
+{
+/*	if(CAnimationManager::GetInstance())
+	{
+		//removes the animation if exists
+		CAnimationManager::GetInstance()->RemoveAnimation(this);
+
+	}
+	if(CInfoPanel::GetInstance())
+	{
+		if(CInfoPanel::GetInstance()->GetSourceImage() == this)
+		{
+			CInfoPanel::GetInstance()->SetSourceImage(NULL);
+		}
+	}*/
+	iMouseState=EMouseStateNone;
+	if(iParentWorkspace)
+	{
+		if(GetOwner())
+		{
+			GetOwner()->RemoveDerivedImage(this);
+		}
+		iParentWorkspace->RemoveImage(this);
+
+	}
+	if(CImageExplorer::GetInstance())
+	{
+		CImageExplorer::GetInstance()->CloseImage(this);
+	}
+	QListIterator<CImage*> derivedImages(iDerivedImages);
+	while(derivedImages.hasNext())
+	{
+		CImage* im=derivedImages.next();
+		im->SetOwner(NULL);
+		im->CloseMe();
+		delete im;
+	}
+	iDerivedImages.clear();
+}
+
+void CImage::RemoveDerivedImage(CImage* image)
+{
+	if(iDerivedImages.contains(image))
+	{
+		iDerivedImages.removeOne(image);
+	}
+}
+
+void CImage::paint(QPainter* painter){
+	QImage img = getImage()->convertToFormat(QImage::Format_RGB32);
+	//QImage img = *iImage;
+	//img->
+	painter->drawImage(QRect(QPoint(GetPosition().x(),GetPosition().y()),QPoint(GetPosition().x()+GetSize().x(),GetPosition().y()+GetSize().y())),img);
+	DrawInnerRect(painter);
+	DrawIcons(painter);
 }

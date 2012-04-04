@@ -10,6 +10,7 @@ class MWorkspaceLayout;
 class CWorkspace : public CObject {
 public:
 	CWorkspace();
+	CWorkspace(CObject *parent, const QPointF &position, const QPointF &size);
 	//void setImageFromFile(QString filename);
 	void addImage(CImage* im);
 	QList<CImage*>& GetImages();
@@ -17,11 +18,12 @@ public:
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	MWorkspaceLayout &GetLayout();
+	void SelectImage(CImage *image);
+	void RemoveImage(CImage *image);
 //private:
+	MWorkspaceLayout *iLayout;
 	QImage* iWorkspaceImage;
 	QList<CImage*> iImages;
-	MWorkspaceLayout *iLayout;
 	CImage *iActiveImage;
-	CImage *iDrawedImage;
 };
 #endif

@@ -8,8 +8,24 @@ void CObject::SetGeometry(float x, float y, float width, float height)
 	iPosition.setY(y);
 	iSize.setX (width);
 	iSize.setY (height);
-	//resizeGL();
+	resizeObject();
+}
+void CObject::resizeObject()
+{
+	iMoveIcon.position.setX(GetBorders().left);
+	iMoveIcon.position.setY(GetBorders().top);
+	iMoveIcon.size.setX(50);
+	iMoveIcon.size.setY(50);
 
+	iResizeIcon.size.setX(50);
+	iResizeIcon.size.setY(50);
+	iResizeIcon.position.setX(iSize.x()-iResizeIcon.size.x()-GetBorders().right);
+	iResizeIcon.position.setY(iSize.y()-iResizeIcon.size.y()-GetBorders().bottom);
+
+	iCloseIcon.size.setX(50);
+	iCloseIcon.size.setY(50);
+	iCloseIcon.position.setX(iSize.x()-iCloseIcon.size.x()-GetBorders().right);
+	iCloseIcon.position.setY(0+GetBorders().bottom);
 }
 CObject::CObject(CObject *parentWindow, const QPointF& position, const QPointF &size ):iParentWindow(parentWindow ),iPosition(position ),iSize(size)
 {	
@@ -23,13 +39,13 @@ CObject::CObject(CObject *parentWindow, const QPointF& position, const QPointF &
 	iMoveIcon.size.setX(50);
 	iMoveIcon.size.setY(50);
 
-	iResizeIcon.size.setX(20);
-	iResizeIcon.size.setY(20);
+	iResizeIcon.size.setX(50);
+	iResizeIcon.size.setY(50);
 	iResizeIcon.position.setX(iSize.x()-iResizeIcon.size.x());
 	iResizeIcon.position.setY(iSize.y()-iResizeIcon.size.y());
 
-	iCloseIcon.size.setX(20);
-	iCloseIcon.size.setY(20);
+	iCloseIcon.size.setX(50);
+	iCloseIcon.size.setY(50);
 	iCloseIcon.position.setX(iSize.x()-iCloseIcon.size.x());
 	iCloseIcon.position.setY(0);
 }
@@ -69,13 +85,8 @@ void CObject::DrawInnerRect(QPainter* painter)
 	int bottom = iSize.y()-r.height()-r.top();
 	int right = r.left()+r.width();
 	int top = iSize.y()-r.top();
-	/*glRectf(r.left(),
-		bottom,
-		right,
-		top);*/
-	//TODO: nakreslit obdelnik woe
 	painter->setPen(QPen(QColor(255,0,0)));
-	painter->drawLine(10,10,20,20);
+
 	QPointF position = GetPosition();
 	QPointF size = GetSize();
 	painter->drawRect(QRect(position.toPoint(),QSize(size.x(),size.y())));
@@ -98,89 +109,30 @@ TColor CObject::GetInnerColor()
 
 
 
-void CObject::DrawIcons(QPainter* painter)
-{
-//	glEnable(GL_BLEND);
+void CObject::DrawIcons(QPainter* painter){
 	float opaq = 0.5;
-//	glBlendFunc(GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA );
-	// nahrat jednotkovou matici
-//	glDisable( GL_TEXTURE_2D );
-
-	//Move icon
 	if(iMoveAbility  )
 	{
-/*		glColor4f(1.0, 1.0, 1.0,opaq); 
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D,CGLWidget::GetInstance()->GetMoveIconTexture ());
-		glBegin(GL_QUADS);
-		glTexCoord2d(0,0); 
-		glVertex2d(iMoveIcon.position.x(),iSize.y()-iMoveIcon.position.y()-iMoveIcon.size.y());
-
-		glTexCoord2d(1,0);
-		glVertex2d(iMoveIcon.position.x()+iMoveIcon.size.x() ,iSize.y()-iMoveIcon.position.y()-iMoveIcon.size.y());
-
-		glTexCoord2d(1,1);
-		glVertex2d(iMoveIcon.position.x()+iMoveIcon.size.x(),iSize.y()-iMoveIcon.position.y());
-
-		glTexCoord2d(0,1);
-		glVertex2d(iMoveIcon.position.x(),iSize.y()-iMoveIcon.position.y());
-		glEnd();
-		glDisable(GL_TEXTURE_2D);*/
 		painter->setPen(QPen(QColor(255,0,0)));
-		QPoint position(iMoveIcon.position.x()+GetPosition().x()+20,iMoveIcon.position.y()+GetPosition().y()+100);
-		painter->drawRect(QRect(position,QSize(10,10)));
+		QPoint position(iMoveIcon.position.x()+GetPosition().x(),iMoveIcon.position.y()+GetPosition().y());
+		painter->drawRect(QRect(position,QSize(30,30)));
 
 	}
 	//Resize icon
 	if(iResizeAbility )
 	{
-		/*glColor4f(1.0, 1.0, 1.0,opaq); 
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D,CGLWidget::GetInstance()->GetResizeIconTexture ());
-		glBegin(GL_QUADS);
-		glTexCoord2d(0,0); 
-		glVertex2d(iResizeIcon.position.x(),iSize.y() - iResizeIcon.position.y() - iResizeIcon.size.y());
-
-		glTexCoord2d(1,0);
-		glVertex2d(iResizeIcon.position.x()+iResizeIcon.size.x() ,iSize.y() - iResizeIcon.position.y() - iResizeIcon.size.y());
-
-		glTexCoord2d(1,1);
-		glVertex2d(iResizeIcon.position.x()+iResizeIcon.size.x(),iSize.y() - iResizeIcon.position.y());
-
-		glTexCoord2d(0,1);
-		glVertex2d(iResizeIcon.position.x(),iSize.y() - iResizeIcon.position.y());
-		glEnd();
-
-		glDisable(GL_TEXTURE_2D);*/
+		painter->setPen(QPen(QColor(255,0,0)));
+		QPoint position(iResizeIcon.position.x()+GetPosition().x(),iResizeIcon.position.y()+GetPosition().y());
+		painter->drawRect(QRect(position,QSize(30,30)));
 		
 	}
 	//Close icon
-	if(iCloseAbility )
+	if(iCloseAbility)
 	{
-		/*glColor4f(1.0, 1.0, 1.0,opaq); 
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D,CGLWidget::GetInstance()->GetCloseIconTexture ());
-		glBegin(GL_QUADS);
-		glTexCoord2d(0,0); 
-		glVertex2d(iCloseIcon.position.x(),iSize.y() - iCloseIcon.position.y() - iCloseIcon.size.y());
-
-		glTexCoord2d(1,0);
-		glVertex2d(iCloseIcon.position.x()+iCloseIcon.size.x() ,iSize.y() - iCloseIcon.position.y() - iCloseIcon.size.y());
-
-		glTexCoord2d(1,1);
-		glVertex2d(iCloseIcon.position.x()+iCloseIcon.size.x(),iSize.y() - iCloseIcon.position.y());
-
-		glTexCoord2d(0,1);
-		glVertex2d(iCloseIcon.position.x(),iSize.y() - iCloseIcon.position.y());
-		glEnd();
-
-		glDisable(GL_TEXTURE_2D);*/
+		painter->setPen(QPen(QColor(255,0,0)));
+		QPoint position(iCloseIcon.position.x()+GetPosition().x(),iCloseIcon.position.y()+GetPosition().y());
+		painter->drawRect(QRect(position,QSize(30,30)));
 	}
-	// glPopMatrix();
-
-	
-	//glDisable (GL_BLEND);
-
 }
 
 void CObject::SetSize(const QPointF &size)
@@ -212,7 +164,7 @@ bool CObject::IsOnCloseIcon(int x, int y)
 
 bool CObject::IsOnResizeIcon(int x, int y)
 {
-
+	std::cout << "\n\niResizeIcon.position.x() " << iResizeIcon.position.x() << "\niResizeIcon.position.y() " << iResizeIcon.position.y() << "\nx " << x << "\ny" << y ;
 	if(!iResizeAbility  )return false;
 
 	if(x<iResizeIcon.position.x())
@@ -240,7 +192,6 @@ void CObject::SetResizeability(bool on)
 bool CObject::IsOnMoveIcon(int x, int y)
 {
 	if(!iMoveAbility )return false;
-
 	if(x<iMoveIcon.position.x())
 		return false;
 	if(y<iMoveIcon.position.y())
@@ -339,9 +290,7 @@ void CObject::Translate()
 		return;
 	//glMatrixMode(GL_MODELVIEW);                 // bude se menit modelova matice
 	//glLoadIdentity();   
-	//glTranslatef(0,iSize.y(),-50.0f);
-	//iParentWindow->height();
-//	int posy=CWidget::GetInstance()->height();
+	int posy=CWidget::GetInstance()->height();
 	//glTranslatef(iPosition.x(),posy-iPosition.y()-iSize.y(), -50.0f); 
 }
 
@@ -397,6 +346,7 @@ const int CObject::width()
 
 bool CObject::IsPointOnObject(int x, int y)
 {
+	std::cout << "\n\niPosition.x() " << iPosition.x() << "\niPosition.y() " << iPosition.y() << "\nx " << x << "\ny" << y ;
 	if(x<iPosition.x())
 		return false;
 	if(y<iPosition.y())

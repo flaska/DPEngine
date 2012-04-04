@@ -22,6 +22,7 @@ class CWorkspace;
 class CImage : public CObject{
 public:
 	CImage(CObject *parentWindow,QString &file, QPointF &position, QPointF &size);
+	CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position, QPointF &size );
 	void setImageFromFile(QString filename);
 	void SetParentWorkspace(CWorkspace *workspace);
 	QImage* getImage();
@@ -33,7 +34,14 @@ public:
 	void SetManipulated(TManipulationState manipulated);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
-
+	CImage* CreateDerivedImage(/*TImageAxisOrientation orientation*/);
+	CImage *GetOwner();
+	void SetOwner(CImage *owner);
+	void CloseMe();
+	void RemoveDerivedImage(CImage* image);
+	TImageWindow GetImageWindow();
+	void SetImageWindow(TImageWindow window);
+	void paint(QPainter*);
 private:
 	QImage* iImage;
 	CWorkspace* iParentWorkspace;
@@ -61,5 +69,7 @@ private:
 	QPointF iLockedPosition ;
 	TManipulationState iManipulated;
 	TMouseState iMouseState;
+	QList<CImage *> iDerivedImages;
+	CImage *iOwner;
 };
 #endif

@@ -1,34 +1,38 @@
 #include <cwidget.h>
 #include <cworkspace.h>
 #include <workspacemanager.h>
+#include <cimageexplorer.h>
 
 CWidget *CWidget::instance = NULL;
 
 CWidget::CWidget(QWidget *parent){
-	iPixmap = new QPixmap(800,800);
+	setFixedSize(900,900);
+	iPixmap = new QPixmap(this->width(),this->height());
 	setPixmap(*iPixmap);
+	
+	CWorkspace *workspace = new CWorkspace(this,QPointF(0,0),QPointF(this->width()*4/5,this->height()*4/5));
+	CWorkspaceManager::InitInstance();
+	CWorkspaceManager::GetInstance()->SetActiveWorkspace(workspace);
+
+	QPointF imageExplorerPos(this->width()*4/5,0);
+	QPointF imageExplorerSize(this->width()*1/5,this->height()*4/5);
+	CImageExplorer::InitInstance(this, imageExplorerPos,imageExplorerSize);
+	iImageExplorer = CImageExplorer::GetInstance();
+
 }
+
 void CWidget::mousePressEvent(QMouseEvent *event)
 {
-	/* DEMO */
-
-	if(event->button() == Qt::RightButton  ) {
-		CImage *im1 = new CImage(NULL, QString("im.dcm"), QPointF(10,10), QPointF(10,10));
-		CWorkspaceManager::GetInstance()->GetActiveWorkspace()->addImage(im1);
-	}
-	/* DEMO */
 	iActiveObject = NULL;
 	//TODO 
-	/*if(CGLImageExplorer::GetInstance())
-	{
-		if(CGLImageExplorer::GetInstance()->IsPointOnObject(event->x(),event->y()))
-		{
+	if(CImageExplorer::GetInstance()){
+		if(CImageExplorer::GetInstance()->IsPointOnObject(event->x(),event->y())){
 			iActiveObject  = iImageExplorer;
 			iImageExplorer->mousePressEvent(event);
-			updateGL ();
+			paint();
 			return;
 		}
-	}
+	}/*
 	if(CGLWorkspaceExplorer::GetInstance())
 	{
 		if(CGLWorkspaceExplorer::GetInstance()->IsPointOnObject(event->x(),event->y()))
@@ -62,9 +66,17 @@ void CWidget::mousePressEvent(QMouseEvent *event)
 
 void CWidget::paint(){
 	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->paint();
-	QImage im = *(CWorkspaceManager::GetInstance()->GetActiveWorkspace()->iWorkspaceImage);
-	iPixmap->convertFromImage(im);
+	QImage iActiveWorkspaceImage = *(CWorkspaceManager::GetInstance()->GetActiveWorkspace()->iWorkspaceImage);
+	QImage *iWidgetImage = new QImage(this->width(),this->height(),QImage::Format_RGB32);
+	iWidgetImage->fill(0);
+	QPainter iWidgetPainter;
+	iWidgetPainter.begin(iWidgetImage);
+	iWidgetPainter.drawImage(QRect(QPoint(0,0),QPoint(this->width()*4/5,this->height()*4/5)),iActiveWorkspaceImage);
+	iWidgetPainter.end();
+	CImageExplorer::GetInstance()->paint(iWidgetImage);
+	iPixmap->convertFromImage(*iWidgetImage);
 	setPixmap(*iPixmap);
+	repaint();
 }
 
 CWidget *CWidget::GetInstance(){
@@ -86,4 +98,15 @@ void CWidget::mouseMoveEvent(QMouseEvent *event)
 	{
 		iActiveObject->mouseMoveEvent(event);
 	}
+}
+
+//QPixmap* CWidget::getWidgetImage(){
+//	return iWidgetImage;
+//}
+
+const int CWidget::height() {	
+	return QLabel::height();
+}
+const int CWidget::width() {
+	return QLabel::width();
 }

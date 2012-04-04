@@ -141,6 +141,7 @@ public:
 	bool IsOnCloseIcon(int x, int y);;
 	void SetSize(const QPointF &size);
 	void SetPosition(const QPointF &position);
+	void resizeObject();
 protected:
 	bool iMoveAbility;
 	bool iResizeAbility;
