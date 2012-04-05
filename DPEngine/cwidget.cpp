@@ -65,15 +65,15 @@ void CWidget::mousePressEvent(QMouseEvent *event)
 }
 
 void CWidget::paint(){
-	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->paint();
-	QImage iActiveWorkspaceImage = *(CWorkspaceManager::GetInstance()->GetActiveWorkspace()->iWorkspaceImage);
+	QImage activeworkspaceimage = *(CWorkspaceManager::GetInstance()->GetActiveWorkspace()->iWorkspaceImage);
 	QImage *iWidgetImage = new QImage(this->width(),this->height(),QImage::Format_RGB32);
 	iWidgetImage->fill(0);
-	QPainter iWidgetPainter;
-	iWidgetPainter.begin(iWidgetImage);
-	iWidgetPainter.drawImage(QRect(QPoint(0,0),QPoint(this->width()*4/5,this->height()*4/5)),iActiveWorkspaceImage);
-	iWidgetPainter.end();
-	CImageExplorer::GetInstance()->paint(iWidgetImage);
+	QPainter *qpainter=new QPainter();
+	qpainter->begin(iWidgetImage);
+	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->paint();
+	qpainter->drawImage(QRect(QPoint(0,0),QPoint(this->width()*4/5,this->height()*4/5)),activeworkspaceimage);
+	CImageExplorer::GetInstance()->paint(qpainter);
+	qpainter->end();
 	iPixmap->convertFromImage(*iWidgetImage);
 	setPixmap(*iPixmap);
 	repaint();

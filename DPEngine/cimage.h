@@ -43,7 +43,7 @@ public:
 	void SetImageWindow(TImageWindow window);
 	void paint(QPainter*);
 private:
-	QImage* iImage;
+	QImage* iActualSliceImage;
 	CWorkspace* iParentWorkspace;
 	CDicom3DTexture *iTexture;
 	QPointF iImageCenter;
@@ -71,5 +71,6 @@ private:
 	TMouseState iMouseState;
 	QList<CImage *> iDerivedImages;
 	CImage *iOwner;
+	void PrepareSlice();
 };
 #endif

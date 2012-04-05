@@ -42,7 +42,7 @@ public:
 	public slots:
 	void Scrolled(int value);ja 
 */
-	void paint(QImage *iWidgetImage);
+	void paint(QPainter*);
 //private:
 	static CImageExplorer* instance;
 	QList<CImage*> iImages;

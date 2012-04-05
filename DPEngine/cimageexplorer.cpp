@@ -21,6 +21,7 @@ CImageExplorer::~CImageExplorer()
 		CImage* obj = images.previous();
 		if(obj)
 		{
+
 			delete obj;
 			obj = NULL;
 		}
@@ -370,7 +371,7 @@ void CImageExplorer::mousePressEvent(QMouseEvent *event)
 */
 }
 
-void CImageExplorer::paint(QImage *iWidgetImage)
+void CImageExplorer::paint(QPainter *painter)
 {
 	Translate();
 	QListIterator<CImage*> images(iImages);
@@ -382,10 +383,7 @@ void CImageExplorer::paint(QImage *iWidgetImage)
 //		if(cimage->GetPosition().y()+cimage->GetSize().y()>0 
 //			&& cimage->GetPosition().y()<=iSize.y())
 		{
-			QPainter *qpainter = new QPainter();
-			qpainter->begin((QPaintDevice*)iWidgetImage);
-			cimage->paint(qpainter);
-			qpainter->end();
+			cimage->paint(painter);
 		}
 	}
 }

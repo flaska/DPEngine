@@ -5,7 +5,7 @@
 #include <settings.h>
 #include <cimageexplorer.h>
 void CImage::setImageFromFile(QString filename){
-	iImage = new QImage(filename);
+	iActualSliceImage = new QImage(filename);
 }
 void CImage::SetParentWorkspace(CWorkspace *workspace)
 {
@@ -13,7 +13,7 @@ void CImage::SetParentWorkspace(CWorkspace *workspace)
 }
 
 QImage* CImage::getImage(){
-	return iImage;
+	return iActualSliceImage;
 }
 
 CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &size ):CObject(parentWindow,position,size)
@@ -36,13 +36,7 @@ CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &
 	}*/
 	iImageWindow.center=int((iImageWindow.center )/CDicomFrames::iWindowMultiplyFactor);
 	iImageWindow.width=int((iImageWindow.width )/CDicomFrames::iWindowMultiplyFactor);
-	//PrepareActualTexture();
-
-	quint8* qi = (quint8*)iTexture->iFrames->GetImageData();
-	uchar * qu = (uchar*)qi;
-	QImage img = QImage(qu, iTexture->iFrames->GetWidth(), iTexture->iFrames->GetHeight(), iTexture->iFrames->GetWidth(), QImage::Format_Indexed8);	
-	iImage = new QImage(img.convertToFormat(QImage::Format_RGB32)); 
-
+	PrepareSlice();
 }
 
 CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position, QPointF &size ):CObject(parentWindow,position,size)
@@ -64,12 +58,31 @@ CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position
 	}*/
 	iImageWindow.center=int((iImageWindow.center )/CDicomFrames::iWindowMultiplyFactor);
 	iImageWindow.width=int((iImageWindow.width )/CDicomFrames::iWindowMultiplyFactor);
-	//PrepareActualTexture();
-
-	quint8* qi = (quint8*)iTexture->iFrames->GetImageData();
-	uchar * qu = (uchar*)qi;
-	iImage = new QImage(qu, iTexture->iFrames->GetWidth(), iTexture->iFrames->GetHeight(), iTexture->iFrames->GetWidth(), QImage::Format_Indexed8);
+	PrepareSlice();
 }
+
+void CImage::PrepareSlice(){
+	quint8* dicomrawdata8bit = (quint8*)iTexture->iFrames->GetImageData();
+	uchar * dicomrawdata16bit = (uchar*)dicomrawdata8bit;
+	int dicomrawdatawidth = iTexture->iFrames->GetWidth();
+	int dicomrawdataheight = iTexture->iFrames->GetHeight();
+	int dicomrawdatabytesperline = iTexture->iFrames->GetWidth();
+	QImage img = QImage(dicomrawdata16bit, dicomrawdatawidth, dicomrawdataheight, dicomrawdatabytesperline, QImage::Format_Indexed8);
+	img = img.convertToFormat(QImage::Format_RGB32);
+	if (img.isNull()) return;
+	int bias = (int)iBias*10.0;
+	for (int y=0; y<dicomrawdataheight; y++){
+		QRgb* imageLine=(QRgb*)img.scanLine(y);
+		for (int x=0; x<dicomrawdatawidth; x++) {
+			float red = (float)qRed(imageLine[x]);
+			float green = (float)qGreen(imageLine[x]);
+			float blue = (float)qBlue(imageLine[x]);
+			imageLine[x]=qRgb(red*iScale+iBias,green*iScale+iBias,blue*iScale+iBias);
+		}
+	}
+	iActualSliceImage = new QImage(img);
+}
+
 
 void CImage::SetGeometry(float x, float y, float width, float height)
 {
@@ -277,11 +290,24 @@ void CImage::mousePressEvent(QMouseEvent *event)
 void CImage::SetImageWindow(TImageWindow window)
 {
 	iImageWindow = window;
-	//PrepareActualTexture();
+
+	float cd= iTexture->GetWindowDefaults().center;
+	float wd =iTexture->GetWindowDefaults().width;
+	float bias;
+	float c = (iImageWindow.center - (cd -wd/2.)) / wd;
+	float w1  = ((iImageWindow.center-iImageWindow.width/2) - (cd -wd/2.)) / wd;
+	float w2 = ((iImageWindow.center+iImageWindow.width/2) - (cd -wd/2.)) / wd;
+	float w = w2-w1;
+	w = iImageWindow.width/wd ;
+	float scale = 1./w;
+	bias =- (c-w/2)*scale;
+	if (scale>0.0 && scale<10.0) iScale = scale;
+	if (bias>0.0 && bias<10.0) iBias = bias;
+
+	PrepareSlice();
 	if(iParentWorkspace)
 	{
 		//iParentWorkspace->UpdateTexture();
-		std::cout << iImageWindow.center;
 	}
 	CWidget::GetInstance()->paint();
 }
@@ -479,9 +505,8 @@ void CImage::RemoveDerivedImage(CImage* image)
 }
 
 void CImage::paint(QPainter* painter){
-	QImage img = getImage()->convertToFormat(QImage::Format_RGB32);
-	//QImage img = *iImage;
-	//img->
+	QImage img = getImage()->copy();
+	if (img.isNull()) return;
 	painter->drawImage(QRect(QPoint(GetPosition().x(),GetPosition().y()),QPoint(GetPosition().x()+GetSize().x(),GetPosition().y()+GetSize().y())),img);
 	DrawInnerRect(painter);
 	DrawIcons(painter);
