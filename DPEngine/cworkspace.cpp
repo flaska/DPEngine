@@ -40,16 +40,17 @@ QList<CImage*>& CWorkspace::GetImages()
 	return iImages;
 }
 
-void CWorkspace::paint(){
+void CWorkspace::paint(QPainter* painter, QRect position){
 	iWorkspaceImage->fill(Qt::black);
 	QListIterator<CImage*> images(iImages);
 	while (images.hasNext()){
 		CImage *cimage = images.next();
 		QPainter *qpainter = new QPainter();
-		qpainter->begin((QPaintDevice*)iWorkspaceImage);
+		qpainter->begin((QPaintDevice*)iWorkspaceImage); std::cout << "CWorkspace\n\n\n";
 		cimage->paint(qpainter);
 		qpainter->end();
 	}
+	painter->drawImage(position,*iWorkspaceImage);
 }
 
 void CWorkspace::mousePressEvent(QMouseEvent *event){

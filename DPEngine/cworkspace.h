@@ -14,7 +14,7 @@ public:
 	//void setImageFromFile(QString filename);
 	void addImage(CImage* im);
 	QList<CImage*>& GetImages();
-	void paint();
+	void paint(QPainter*, QRect);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	MWorkspaceLayout &GetLayout();

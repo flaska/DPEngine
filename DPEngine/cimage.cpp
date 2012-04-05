@@ -18,6 +18,7 @@ QImage* CImage::getImage(){
 
 CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &size ):CObject(parentWindow,position,size)
 {	
+	iActualSliceImage = NULL;
 	if(!C3DTextureManager::GetInstance())
 	{
 //TODO		throw TextureNotCreatedException(); 
@@ -41,6 +42,7 @@ CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &
 
 CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position, QPointF &size ):CObject(parentWindow,position,size)
 {	
+	iActualSliceImage = NULL;
 	if(!texture)
 	{
 //TODO		throw DicomFramesException();
@@ -80,6 +82,8 @@ void CImage::PrepareSlice(){
 			imageLine[x]=qRgb(red*iScale+iBias,green*iScale+iBias,blue*iScale+iBias);
 		}
 	}
+	if (iActualSliceImage)
+		delete iActualSliceImage;
 	iActualSliceImage = new QImage(img);
 }
 
@@ -322,7 +326,9 @@ void CImage::mouseMoveEvent(QMouseEvent *event)
 	int x=event->x() - iPosition.x();
 	int y = event->y()- iPosition.y();
 	int dx = x-iPreviousMousePosition.x();
+	dx=dx/4;
 	int dy = y-iPreviousMousePosition.y();
+	dy=4*dy;
 
 	if(EMouseStateImageWindowLeveling==iMouseState)
 	{

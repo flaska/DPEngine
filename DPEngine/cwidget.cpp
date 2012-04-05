@@ -63,7 +63,7 @@ void CWidget::mousePressEvent(QMouseEvent *event)
 		}*/
 	}
 }
-
+/*
 void CWidget::paint(){
 	QImage activeworkspaceimage = *(CWorkspaceManager::GetInstance()->GetActiveWorkspace()->iWorkspaceImage);
 	QImage *iWidgetImage = new QImage(this->width(),this->height(),QImage::Format_RGB32);
@@ -77,6 +77,21 @@ void CWidget::paint(){
 	iPixmap->convertFromImage(*iWidgetImage);
 	setPixmap(*iPixmap);
 	repaint();
+}*/
+
+void CWidget::paint(){
+	QImage *iWidgetImage = new QImage(this->width(),this->height(),QImage::Format_RGB32);
+	iWidgetImage->fill(0);
+	QPainter *qpainter=new QPainter();
+	qpainter->begin(iWidgetImage);
+	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->paint(qpainter,QRect(QPoint(0,0),QPoint(this->width()*4/5,this->height()*4/5)));
+	CImageExplorer::GetInstance()->paint(qpainter); // pridat qrect
+	qpainter->end();
+	iPixmap->convertFromImage(*iWidgetImage);
+	setPixmap(*iPixmap);
+	repaint();
+	delete qpainter;
+	delete iWidgetImage;
 }
 
 CWidget *CWidget::GetInstance(){
