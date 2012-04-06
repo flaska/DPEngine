@@ -5,20 +5,25 @@
 #include <settings.h>
 #include <cimageexplorer.h>
 void CImage::setImageFromFile(QString filename){
-	iActualSliceImage = new QImage(filename);
+	iActualSliceCompleteImage = new QImage(filename);
 }
 void CImage::SetParentWorkspace(CWorkspace *workspace)
 {
 	iParentWorkspace=workspace;
 }
 
-QImage* CImage::getImage(){
-	return iActualSliceImage;
+QImage* CImage::getCompleteImage(){
+	return iActualSliceCompleteImage;
+}
+
+QImage* CImage::getCropImage(){
+	return iActualSliceCropImage;
 }
 
 CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &size ):CObject(parentWindow,position,size)
 {	
-	iActualSliceImage = NULL;
+	iActualSliceCompleteImage = NULL;
+	iActualSliceCropImage = NULL;
 	if(!C3DTextureManager::GetInstance())
 	{
 //TODO		throw TextureNotCreatedException(); 
@@ -42,7 +47,8 @@ CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &
 
 CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position, QPointF &size ):CObject(parentWindow,position,size)
 {	
-	iActualSliceImage = NULL;
+	iActualSliceCompleteImage = NULL;
+	iActualSliceCropImage = NULL;
 	if(!texture)
 	{
 //TODO		throw DicomFramesException();
@@ -76,17 +82,50 @@ void CImage::PrepareSlice(){
 	for (int y=0; y<dicomrawdataheight; y++){
 		QRgb* imageLine=(QRgb*)img.scanLine(y);
 		for (int x=0; x<dicomrawdatawidth; x++) {
-			float red = (float)qRed(imageLine[x]);
-			float green = (float)qGreen(imageLine[x]);
-			float blue = (float)qBlue(imageLine[x]);
-			imageLine[x]=qRgb(red*iScale+iBias,green*iScale+iBias,blue*iScale+iBias);
+			float originalintensity = (float)qRed(imageLine[x]);
+			int newintensity = (int)(originalintensity*iScale+iBias);
+			if(newintensity>255) newintensity=255;
+			if(newintensity<0) newintensity=0;
+			imageLine[x]=qRgb(newintensity,newintensity,newintensity);
 		}
 	}
-	if (iActualSliceImage)
-		delete iActualSliceImage;
-	iActualSliceImage = new QImage(img);
+	//std::cout << "iBias" << iBias << std::endl;
+	if (iActualSliceCompleteImage)
+		delete iActualSliceCompleteImage;
+	iActualSliceCompleteImage = new QImage(img);
 }
 
+void CImage::PrepareImageCrop(){
+	int width=iSize.x()-GetBorders().right-GetBorders().left;
+	int height=iSize.y()-GetBorders().bottom-GetBorders().top;
+	int xcenter = iImageCenter.x()*width;
+	int ycenter = iImageCenter.y()*height;
+	float xgapbefore = (xcenter - (((float)iTexture->GetWidth()/2)*iZoomFactor));
+	float ygapbefore = (ycenter - (((float)iTexture->GetHeight()/2)*iZoomFactor));
+
+	float xgapafter = (((float)iTexture->GetWidth()/2)*iZoomFactor)-(width-xcenter);
+	float ygapafter = (((float)iTexture->GetHeight()/2)*iZoomFactor)-(height-ycenter);
+
+	QPointF leftTopScaled (
+		-xgapbefore/(iTexture->GetWidth() * iZoomFactor),
+		-ygapbefore/(iTexture->GetHeight() * iZoomFactor)
+	);
+	QPointF rightBottomScaled (
+		1.- (xgapafter/(iTexture->GetWidth()*iZoomFactor)),
+		1.- (ygapafter/(iTexture->GetHeight()*iZoomFactor))
+	);
+	QPoint leftTopReal (
+		leftTopScaled.x()*iActualSliceCompleteImage->width(),
+		leftTopScaled.y()*iActualSliceCompleteImage->height()
+	);
+	QPoint rightBottomReal (
+		rightBottomScaled.x()*iActualSliceCompleteImage->width(),
+		rightBottomScaled.y()*iActualSliceCompleteImage->height()
+	);
+	if (iActualSliceCropImage)
+		delete iActualSliceCropImage;
+	iActualSliceCropImage = new QImage(getCompleteImage()->copy(QRect(leftTopReal,rightBottomReal)));
+}
 
 void CImage::SetGeometry(float x, float y, float width, float height)
 {
@@ -274,12 +313,12 @@ void CImage::mousePressEvent(QMouseEvent *event)
 		return;		
 	}
 */
-	/*if(event->button() == Qt::LeftButton )
+	if(event->button() == Qt::LeftButton )
 	{
 		iMouseState = EMouseStateImageMoving;
 		return;
 	}
-
+/*
 	if(event->button() == Qt::MidButton )
 	{
 		iMouseState = EMouseStateImageZooming;
@@ -305,8 +344,8 @@ void CImage::SetImageWindow(TImageWindow window)
 	w = iImageWindow.width/wd ;
 	float scale = 1./w;
 	bias =- (c-w/2)*scale;
-	if (scale>0.0 && scale<10.0) iScale = scale;
-	if (bias>0.0 && bias<10.0) iBias = bias;
+	if (scale>0.0 && scale<100.0) iScale = scale;
+	if (bias>0.0 && bias<100.0) iBias = bias;
 
 	PrepareSlice();
 	if(iParentWorkspace)
@@ -326,16 +365,17 @@ void CImage::mouseMoveEvent(QMouseEvent *event)
 	int x=event->x() - iPosition.x();
 	int y = event->y()- iPosition.y();
 	int dx = x-iPreviousMousePosition.x();
-	dx=dx/4;
 	int dy = y-iPreviousMousePosition.y();
-	dy=4*dy;
-
 	if(EMouseStateImageWindowLeveling==iMouseState)
 	{
 		QCursor::setPos(iLockedGlobalMousePosition);
+		//iScale *=(1.+(float)dx/50.);
+		//iBias *=(1.+(float)dy/100.);
 		iImageWindow.center+=4*dy;
 		if(iImageWindow.center>65596)
 			iImageWindow.center = 65096;
+		//if(iImageWindow.center<0)
+		//	iImageWindow.center = 0;
 		iImageWindow.width+=4*dx;
 		if(iImageWindow.width>65096)
 			iImageWindow.width = 65096;
@@ -362,7 +402,7 @@ void CImage::mouseMoveEvent(QMouseEvent *event)
 		return;
 	}
 	else 
-	
+	*/
 	if(iMouseState == EMouseStateImageMoving)
 	{
 		iImageCenter.setX(iImageCenter.x()+(float)dx/iSize.x());
@@ -371,11 +411,12 @@ void CImage::mouseMoveEvent(QMouseEvent *event)
 		{
 			//iParentWorkspace->UpdateTexture();
 		}
+		PrepareImageCrop();
 		//CGLWidget::GetInstance()->updateGL ();
 		//return;
 	}
 	//TODO
-	
+	/*
 	else */
 	if(iMouseState == EMouseStateObjectMoving)
 	{
@@ -413,6 +454,7 @@ void CImage::mouseMoveEvent(QMouseEvent *event)
 	iPreviousMousePosition = QPoint(x, y);	
 	//iPreviousGlobalMousePosition = event->globalPos();
 	*/
+	iPreviousMousePosition = QPoint(x, y);	
 	CWidget::GetInstance()->paint();
 }
 
@@ -511,7 +553,8 @@ void CImage::RemoveDerivedImage(CImage* image)
 }
 
 void CImage::paint(QPainter* painter){
-	QImage img = getImage()->copy();
+	PrepareImageCrop();
+	QImage img = getCropImage()->copy();
 	if (img.isNull()) return;
 	painter->drawImage(QRect(QPoint(GetPosition().x(),GetPosition().y()),QPoint(GetPosition().x()+GetSize().x(),GetPosition().y()+GetSize().y())),img);
 	DrawInnerRect(painter);

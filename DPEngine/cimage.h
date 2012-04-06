@@ -25,7 +25,8 @@ public:
 	CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position, QPointF &size );
 	void setImageFromFile(QString filename);
 	void SetParentWorkspace(CWorkspace *workspace);
-	QImage* getImage();
+	QImage* getCompleteImage();
+	QImage* getCropImage();
 	void SetGeometry(float x, float y, float width, float height);
 	void DrawImage();
 	void Init(CObject *parentWindow, QPointF& position, QPointF &size);
@@ -43,7 +44,8 @@ public:
 	void SetImageWindow(TImageWindow window);
 	void paint(QPainter*);
 private:
-	QImage* iActualSliceImage;
+	QImage* iActualSliceCompleteImage;
+	QImage* iActualSliceCropImage;
 	CWorkspace* iParentWorkspace;
 	CDicom3DTexture *iTexture;
 	QPointF iImageCenter;
@@ -72,5 +74,6 @@ private:
 	QList<CImage *> iDerivedImages;
 	CImage *iOwner;
 	void PrepareSlice();
+	void PrepareImageCrop();
 };
 #endif

@@ -164,7 +164,6 @@ bool CObject::IsOnCloseIcon(int x, int y)
 
 bool CObject::IsOnResizeIcon(int x, int y)
 {
-	std::cout << "\n\niResizeIcon.position.x() " << iResizeIcon.position.x() << "\niResizeIcon.position.y() " << iResizeIcon.position.y() << "\nx " << x << "\ny" << y ;
 	if(!iResizeAbility  )return false;
 
 	if(x<iResizeIcon.position.x())
@@ -346,7 +345,6 @@ const int CObject::width()
 
 bool CObject::IsPointOnObject(int x, int y)
 {
-	std::cout << "\n\niPosition.x() " << iPosition.x() << "\niPosition.y() " << iPosition.y() << "\nx " << x << "\ny" << y ;
 	if(x<iPosition.x())
 		return false;
 	if(y<iPosition.y())

@@ -46,7 +46,7 @@ void CWorkspace::paint(QPainter* painter, QRect position){
 	while (images.hasNext()){
 		CImage *cimage = images.next();
 		QPainter *qpainter = new QPainter();
-		qpainter->begin((QPaintDevice*)iWorkspaceImage); std::cout << "CWorkspace\n\n\n";
+		qpainter->begin((QPaintDevice*)iWorkspaceImage);
 		cimage->paint(qpainter);
 		qpainter->end();
 	}
