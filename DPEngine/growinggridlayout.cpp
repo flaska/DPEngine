@@ -269,7 +269,7 @@ bool CGrowingGridLayout::PrepareNewImageGeometry(CImage *image)
 					iImageGrid[i][j]=im;
 					float zoom = (float)defaultSize.x()/(float)im->GetTexture()->GetWidth();
 					zoom/=iColumnCount;
-					im->SetZoom(zoom);
+					//im->SetZoom(zoom);
 					im->SetPosition(QPoint(
 						iColumnLefts[i],
 						iRowsTops[j]));
@@ -302,7 +302,7 @@ bool CGrowingGridLayout::PrepareNewImageGeometry(CImage *image)
 				float zoom = (float)iParentWorkspace->GetSize().x()/(float)im->GetTexture()->GetWidth();
 
 				zoom/=iColumnCount;
-				im->SetZoom(zoom);
+				//im->SetZoom(zoom);
 				goto lblImageAdded;
 			}
 
