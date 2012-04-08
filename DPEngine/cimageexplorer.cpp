@@ -422,3 +422,33 @@ void CImageExplorer::CloseImage(CImage *image)
 		CInfoPanel::GetInstance()->SetImageExplorerInfoView();
 	}*/
 }
+
+void CImageExplorer::SetGeometry(int x, int y, int width, int height)
+{
+	QPointF oldPos = iPosition;
+	QPointF oldSize = iSize;
+	CObject::SetGeometry(x,y,width,height);
+	iScrollBar->setGeometry (
+		iPosition.x()+iSize.x()-15-GetBorders().right,
+		iPosition.y()+GetBorders().top,
+		15,
+		iPosition.y()+iSize.y()-GetBorders().top-GetBorders().bottom
+		);
+	QListIterator<CImage*> images(iImages);
+	int posy;
+	if(images.hasNext())
+	{
+		posy=images.next()->GetPosition().y();
+	}
+	images.toFront();
+	while(images.hasNext())
+	{
+		CImage* im = images.next();
+		int width = iSize.x()-GetBorders().right-GetBorders().left-iScrollBar->size().width();
+		QPoint size(width,width);
+		int posx=iPosition.x()+GetBorders().left;
+		im->SetGeometry(posx,posy, size.x(),size.y());
+		posy+=size.y();
+
+	}
+}

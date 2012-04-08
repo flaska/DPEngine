@@ -20,10 +20,14 @@ public:
 	MWorkspaceLayout &GetLayout();
 	void SelectImage(CImage *image);
 	void RemoveImage(CImage *image);
+	void SetGeometry(float x, float y, float w, float h);
 //private:
 	MWorkspaceLayout *iLayout;
 	QImage* iWorkspaceImage;
 	QList<CImage*> iImages;
 	CImage *iActiveImage;
+	void resizeEvent(QSize size);
+	float iLastInnerHeight;
+	float iLastInnerWidth;
 };
 #endif

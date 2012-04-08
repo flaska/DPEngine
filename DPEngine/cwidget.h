@@ -12,10 +12,13 @@ public:
 	static CWidget* InitInstance(QWidget *parent);
 	const int width();
 	const int height();
+	void SetGeometry(int x, int y, int w, int h);
 	QPixmap* getWidgetImage();
 //private:
 	QPixmap* iPixmap;
 	static CWidget *instance;
 	CObject *iActiveObject;
 	CImageExplorer* iImageExplorer;
+private:
+	void resizeEvent(QResizeEvent*);
 };

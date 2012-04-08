@@ -50,6 +50,7 @@ public:
 	static int GetIntegerConstant(TSettingConstants constant);
 	static TBorders GetBordersConstant(TSettingConstants constant);
 	static TColor GetColorConstant(TSettingConstants constant);
+	static int iconSize;
 protected:
 	Settings();
 private:

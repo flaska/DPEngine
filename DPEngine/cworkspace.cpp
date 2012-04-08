@@ -9,6 +9,8 @@
 #include <cimageexplorer.h>
 #include <cwidget.h>
 CWorkspace::CWorkspace(CObject *parent, const QPointF &position, const QPointF &size):CObject(parent, position, size){
+	iLastInnerHeight = 0;
+	iLastInnerWidth = 0;
 	iWorkspaceImage = new QImage(size.x(),size.y(),QImage::Format_RGB32);
 	iWorkspaceImage->fill(Qt::yellow);
 	SetSize(QPointF(size.x(),size.y()));
@@ -19,6 +21,12 @@ CWorkspace::CWorkspace(CObject *parent, const QPointF &position, const QPointF &
 	b.right=0;
 	b.top=0;
 	this->SetBorders(b);
+}
+
+void CWorkspace::resizeEvent(QSize size){
+	if (iWorkspaceImage) delete iWorkspaceImage;
+	iWorkspaceImage = new QImage(size.width(),size.height(),QImage::Format_RGB32);
+	SetSize(QPointF(size.width(),size.height()));
 }
 
 void CWorkspace::addImage(CImage *image)
@@ -118,4 +126,47 @@ void CWorkspace::RemoveImage(CImage *image)
 	{
 		CWidget::GetInstance()->paint();
 	}
+}
+
+
+void CWorkspace::SetGeometry(float x, float y, float w, float h)
+{
+	if (iWorkspaceImage) delete iWorkspaceImage;
+	iWorkspaceImage = new QImage(w,h,QImage::Format_RGB32);
+	
+	QPointF oldPos = iPosition;
+	if(iLastInnerHeight ==0)
+	{
+
+		iLastInnerWidth = iSize.x()-GetBorders().left-GetBorders().right;
+		iLastInnerHeight = iSize.y()-GetBorders().top-GetBorders().bottom;
+	}
+	int posxdif = x - oldPos.x();
+	int posydif = y - oldPos.y();
+	int innerWidth = w - GetBorders().left-GetBorders().right;
+	int innerHeight = h- GetBorders().top-GetBorders().bottom;
+	float sizeRatioX = (float)(innerWidth)/((float)iLastInnerWidth);
+	float sizeRatioY = (float)(innerHeight)/((float)iLastInnerHeight);
+	iLastInnerWidth = innerWidth;
+	iLastInnerHeight = innerHeight;
+
+	CObject::SetGeometry(x,y,w,h);
+
+	QListIterator<CImage*> images(iImages);
+	images.toFront();
+	while(images.hasNext())
+	{
+		CImage* im = images.next();
+		QPointF pos(im->GetPosition().x()-GetBorders().left,im->GetPosition().y()-GetBorders().top);
+		QPointF size = im->GetSize();
+		QPointF newPos;
+		newPos.setX(GetBorders().left+pos.x()*sizeRatioX+posxdif*sizeRatioX);
+		newPos.setY(GetBorders().top+pos.y()*sizeRatioY+posydif*sizeRatioY);
+		QPointF newSize;
+		newSize.setX(size.x()*sizeRatioX);
+		newSize.setY(size.y()*sizeRatioY);
+		im->SetGeometry(newPos.x(),newPos.y(), newSize.x(),newSize.y());
+	}
+	//UpdateTexture();
+	
 }

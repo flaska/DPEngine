@@ -2,6 +2,7 @@
 #include <QtCore/QSettings>
 #include <QtCore/QRect>
 #include <QtCore/QRectF>
+int Settings::iconSize = 25;
 bool Settings::iDeleted = false;
 bool Settings::iSettingsRead = false;
 int Settings::KWorkspaceTextureWidth = 768; //must be 2^n ?

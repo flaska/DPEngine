@@ -6,9 +6,11 @@
 CWidget *CWidget::instance = NULL;
 
 CWidget::CWidget(QWidget *parent){
-	setFixedSize(900,900);
-	iPixmap = new QPixmap(this->width(),this->height());
-	setPixmap(*iPixmap);
+	iPixmap = NULL;
+	resize(500,500);
+	SetGeometry(0,0,500,500);
+	//iPixmap = new QPixmap(this->width(),this->height());
+	//setPixmap(*iPixmap);
 	
 	CWorkspace *workspace = new CWorkspace(this,QPointF(0,0),QPointF(this->width()*4/5,this->height()*4/5));
 	CWorkspaceManager::InitInstance();
@@ -21,8 +23,69 @@ CWidget::CWidget(QWidget *parent){
 
 }
 
+void CWidget::resizeEvent(QResizeEvent * event){/*
+	if (iPixmap) delete iPixmap;
+	iPixmap = new QPixmap(event->size().width(),event->size().height());
+	setPixmap(*iPixmap);
+
+	if (CWorkspaceManager::GetInstance()) CWorkspaceManager::GetInstance()->GetActiveWorkspace()->resizeEvent(QSize(event->size().width()*4/5,event->size().height()*4/5));
+*//*
+	QPointF imageExplorerPos(this->width()*4/5,0);
+	QPointF imageExplorerSize(this->width()*1/5,this->height()*4/5);
+	paint();
+*/
+	SetGeometry(0,0,event->size().width(),event->size().height());
+}
+
+void CWidget::SetGeometry(int x, int y, int w, int h)
+{
+ 	if (iPixmap) delete iPixmap;
+	iPixmap = new QPixmap(w,h);
+	setPixmap(*iPixmap);
+
+	if(!CWorkspaceManager::GetInstance()) {
+		return;
+	}
+	iSize.setX(w);
+	iSize.setY(h);
+	int height = h;
+	int width =w;
+	if (height==0)								// Prevent A Divide By Zero By
+	{
+		height=1;
+	}					
+
+	QPoint imageExplorerPos(this->width()*4/5,0);
+	QPoint imageExplorerSize(this->width()-imageExplorerPos.x(),this->height()*4/5);
+	iImageExplorer->SetGeometry(imageExplorerPos.x(),imageExplorerPos.y(),imageExplorerSize.x(),imageExplorerSize.y());
+
+	//QPoint workspaceExplorerPos(0,this->height()*4/5);
+	//QPoint workspaceExplorerSize(this->width(),this->height()-workspaceExplorerPos.y());
+
+	//iWorkspaceExplorer->SetGeometry(workspaceExplorerPos.x(),workspaceExplorerPos.y(),workspaceExplorerSize.x(),workspaceExplorerSize.y());;
+
+	QPoint workspacePos(0,0);
+	QPoint workspaceSize(this->width()*4/5,this->height()*4/5);
+
+	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->SetGeometry(workspacePos.x(),workspacePos.y(),
+		workspaceSize.x(),workspaceSize.y());
+	/*QListIterator<CWorkspace*> workspaces((CWorkspaceManager::GetInstance()->GetWorkspaces()));
+	workspaces.toFront();
+	while(workspaces.hasNext())
+	{
+		CWorkspace* ws = workspaces.next();
+		ws->SetGeometry(workspacePos.x(),workspacePos.y(),
+		workspaceSize.x(),workspaceSize.y());
+	}
+	CGLObject::resizeGL();*/
+	paint();
+}
+
+
+
 void CWidget::mousePressEvent(QMouseEvent *event)
 {
+	std::cout << "Mouse X " << event->x() << "Mouse Y " << event->y() << std::endl;
 	iActiveObject = NULL;
 	//TODO 
 	if(CImageExplorer::GetInstance()){

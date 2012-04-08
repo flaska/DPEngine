@@ -1,5 +1,6 @@
 #include <cobject.h>
 #include <cwidget.h>
+#include <settings.h>
 
 
 void CObject::SetGeometry(float x, float y, float width, float height)
@@ -14,16 +15,16 @@ void CObject::resizeObject()
 {
 	iMoveIcon.position.setX(GetBorders().left);
 	iMoveIcon.position.setY(GetBorders().top);
-	iMoveIcon.size.setX(50);
-	iMoveIcon.size.setY(50);
+	iMoveIcon.size.setX(Settings::iconSize);
+	iMoveIcon.size.setY(Settings::iconSize);
 
-	iResizeIcon.size.setX(50);
-	iResizeIcon.size.setY(50);
+	iResizeIcon.size.setX(Settings::iconSize);
+	iResizeIcon.size.setY(Settings::iconSize);
 	iResizeIcon.position.setX(iSize.x()-iResizeIcon.size.x()-GetBorders().right);
 	iResizeIcon.position.setY(iSize.y()-iResizeIcon.size.y()-GetBorders().bottom);
 
-	iCloseIcon.size.setX(50);
-	iCloseIcon.size.setY(50);
+	iCloseIcon.size.setX(Settings::iconSize);
+	iCloseIcon.size.setY(Settings::iconSize);
 	iCloseIcon.position.setX(iSize.x()-iCloseIcon.size.x()-GetBorders().right);
 	iCloseIcon.position.setY(0+GetBorders().bottom);
 }
@@ -36,16 +37,16 @@ CObject::CObject(CObject *parentWindow, const QPointF& position, const QPointF &
 	
 	iMoveIcon.position.setX(0);
 	iMoveIcon.position.setY(0);
-	iMoveIcon.size.setX(50);
-	iMoveIcon.size.setY(50);
+	iMoveIcon.size.setX(Settings::iconSize);
+	iMoveIcon.size.setY(Settings::iconSize);
 
-	iResizeIcon.size.setX(50);
-	iResizeIcon.size.setY(50);
+	iResizeIcon.size.setX(Settings::iconSize);
+	iResizeIcon.size.setY(Settings::iconSize);
 	iResizeIcon.position.setX(iSize.x()-iResizeIcon.size.x());
 	iResizeIcon.position.setY(iSize.y()-iResizeIcon.size.y());
 
-	iCloseIcon.size.setX(50);
-	iCloseIcon.size.setY(50);
+	iCloseIcon.size.setX(Settings::iconSize);
+	iCloseIcon.size.setY(Settings::iconSize);
 	iCloseIcon.position.setX(iSize.x()-iCloseIcon.size.x());
 	iCloseIcon.position.setY(0);
 }
@@ -115,7 +116,7 @@ void CObject::DrawIcons(QPainter* painter){
 	{
 		painter->setPen(QPen(QColor(255,0,0)));
 		QPoint position(iMoveIcon.position.x()+GetPosition().x(),iMoveIcon.position.y()+GetPosition().y());
-		painter->drawRect(QRect(position,QSize(30,30)));
+		painter->drawRect(QRect(position,QSize(iMoveIcon.size.x(),iMoveIcon.size.y())));
 
 	}
 	//Resize icon
@@ -123,7 +124,9 @@ void CObject::DrawIcons(QPainter* painter){
 	{
 		painter->setPen(QPen(QColor(255,0,0)));
 		QPoint position(iResizeIcon.position.x()+GetPosition().x(),iResizeIcon.position.y()+GetPosition().y());
-		painter->drawRect(QRect(position,QSize(30,30)));
+		painter->drawRect(QRect(position,QSize(iResizeIcon.size.x(),iResizeIcon.size.y())));
+		std::cout << "Resize Icon Visual Position LT: x" << position.x() << " y " << position.y() << std::endl;
+		std::cout << "Resize Icon Visual Position RB: x" << position.x() +  iCloseIcon.size.x() << " y " << position.y() + iCloseIcon.size.y() << std::endl;
 		
 	}
 	//Close icon
@@ -131,7 +134,7 @@ void CObject::DrawIcons(QPainter* painter){
 	{
 		painter->setPen(QPen(QColor(255,0,0)));
 		QPoint position(iCloseIcon.position.x()+GetPosition().x(),iCloseIcon.position.y()+GetPosition().y());
-		painter->drawRect(QRect(position,QSize(30,30)));
+		painter->drawRect(QRect(position,QSize(iCloseIcon.size.x(),iCloseIcon.size.y())));
 	}
 }
 
@@ -164,6 +167,9 @@ bool CObject::IsOnCloseIcon(int x, int y)
 
 bool CObject::IsOnResizeIcon(int x, int y)
 {
+
+		std::cout << "Resize Icon Real Position LT: x" << iResizeIcon.position.x() + iPosition.x()<< " y " << iResizeIcon.position.y() + iPosition.y() << std::endl;
+		std::cout << "Resize Icon Real Position RB: x" << iResizeIcon.position.x()+iResizeIcon.size.x() + iPosition.x()<< " y " << iResizeIcon.position.y()+iResizeIcon.size.y() + iPosition.y()<< std::endl;
 	if(!iResizeAbility  )return false;
 
 	if(x<iResizeIcon.position.x())

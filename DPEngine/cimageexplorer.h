@@ -28,6 +28,7 @@ public:
 	void DrawIcons();
 	void DrawTexts();
 	CImage* GetSelectedImage();
+	void SetGeometry(int x, int y, int width, int height);
 //TODO	void paintGL();
 /*	void SetGeometry(int x, int y, int width, int height);
 	void mouseReleaseEvent(QMouseEvent *event);
