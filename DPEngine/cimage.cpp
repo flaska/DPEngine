@@ -4,6 +4,8 @@
 #include <dicom3DTextureManager.h>
 #include <settings.h>
 #include <cimageexplorer.h>
+
+
 void CImage::setImageFromFile(QString filename){
 	iActualSliceCompleteImage = new QImage(filename);
 }
@@ -368,15 +370,15 @@ void CImage::mouseMoveEvent(QMouseEvent *event)
 	int dy = y-iPreviousMousePosition.y();
 	if(EMouseStateImageWindowLeveling==iMouseState)
 	{
+		dx = dx * Settings::imageWindowingWidthSensitivity;
+		dy = dy * Settings::imageWindowingCenterSensitivity;
 		QCursor::setPos(iLockedGlobalMousePosition);
-		//iScale *=(1.+(float)dx/50.);
-		//iBias *=(1.+(float)dy/100.);
-		iImageWindow.center+=4*dy;
+		iImageWindow.center+=dy;
 		if(iImageWindow.center>65596)
 			iImageWindow.center = 65096;
 		//if(iImageWindow.center<0)
 		//	iImageWindow.center = 0;
-		iImageWindow.width+=4*dx;
+		iImageWindow.width+=dx;
 		if(iImageWindow.width>65096)
 			iImageWindow.width = 65096;
 		if(iImageWindow.width<1)
@@ -556,7 +558,7 @@ void CImage::paint(QPainter* painter){
 	PrepareImageCrop();
 	QImage img = getCropImage()->copy();
 	if (img.isNull()) return;
-	painter->drawImage(QRect(QPoint(GetPosition().x(),GetPosition().y()),QPoint(GetPosition().x()+GetSize().x(),GetPosition().y()+GetSize().y())),img);
-	DrawInnerRect(painter);
+	painter->drawImage(QRect(QPoint(GetPosition().x()+GetBorders().left,GetPosition().y()+GetBorders().top),QPoint(GetPosition().x()+GetSize().x()-GetBorders().right,GetPosition().y()+GetSize().y()-GetBorders().bottom)),img);
+	DrawBorderRect(painter);
 	DrawIcons(painter);
 }

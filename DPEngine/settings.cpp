@@ -2,6 +2,8 @@
 #include <QtCore/QSettings>
 #include <QtCore/QRect>
 #include <QtCore/QRectF>
+int Settings::imageWindowingCenterSensitivity = 40;
+int Settings::imageWindowingWidthSensitivity = 4;
 int Settings::iconSize = 25;
 bool Settings::iDeleted = false;
 bool Settings::iSettingsRead = false;
@@ -13,6 +15,7 @@ int Settings::KInfoPanelMarginTop=2;
 int Settings::KInfoPanelMarginRight=2;
 int Settings::KInfoPanelMarginBottom=2;
 int Settings::KMaximumFramesToLoad=1000;
+int Settings::imageExplorerSize = 200;
 TBorders Settings::KImageBorders={3,3,3,3};
 TColor Settings::KImageBorderColor={0.2,0.2,0.2,1};
 TColor Settings::KImageInnerColor={0.2,0.2,0.2,1};
@@ -36,6 +39,12 @@ TColor Settings::KWorkspaceInnerColor={0.2,0.2,0.2,1};
 TColor Settings::KImageExplorerTextColor={0.2,0.9,0.9,1.};
 TColor Settings::KWorkspaceExplorerTextColor={0.2,0.9,0.9,1.};
 Settings *Settings::instance;
+
+QString Settings::MoveIconFileName = QString("moveicon.bmp");
+QString Settings::CloseIconFileName = QString("closeicon.bmp");
+QString Settings::ResizeIconFileName = QString("resizeicon.bmp");
+
+
 Settings::Settings()
 {
 }
@@ -138,8 +147,8 @@ void Settings::ReadSettings()
 	QRect imageBorders = settings.value("ImageBorders", QRect(10,10,10,10)).toRect();
 	KImageBorders.left = imageBorders.left();
 	KImageBorders.top=	imageBorders.top();
-	KImageBorders.right=imageBorders.right();
-	KImageBorders.bottom=imageBorders.bottom();
+	KImageBorders.right=imageBorders.right()-imageBorders.left()+1;
+	KImageBorders.bottom=imageBorders.bottom()-imageBorders.top()+1;
 
 	QRectF imageBorderColor = settings.value("ImageBorderColor", QRectF(1,1,1,1)).toRectF();
 	KImageBorderColor.r = imageBorderColor.left()/255.0f;

@@ -117,7 +117,7 @@ public:
 	{
 		return iBorders;
 	};
-	void DrawSelection();
+	void DrawSelection(QPainter* painter);
 	/* TODO: 
 	virtual void mouseMoveEvent(QMouseEvent *event)=0;
 	virtual void wheelEvent(QWheelEvent *event)=0;	
@@ -130,7 +130,7 @@ public:
 	void SetBorderColor(float r, float g, float b, float alpha);
 	void SetBorderColor(TColor color);
 	TColor GetBorderColor();
-	void DrawBorderRect();
+	void DrawBorderRect(QPainter*);
 	void DrawInnerRect(QPainter*);
 	void DrawIcons(QPainter*);
 	void SetInnerColor(float r, float g, float b, float alpha);

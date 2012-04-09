@@ -15,12 +15,10 @@ CWorkspace::CWorkspace(CObject *parent, const QPointF &position, const QPointF &
 	iWorkspaceImage->fill(Qt::yellow);
 	SetSize(QPointF(size.x(),size.y()));
 	iLayout = new CGrowingGridLayout(this,EGrowinGridLayoutHorizontal);
-	TBorders b;
-	b.bottom=0;
-	b.left=0;
-	b.right=0;
-	b.top=0;
-	this->SetBorders(b);
+	SetBorders(Settings::GetBordersConstant(EWorkspaceBorders));
+	SetBorderColor(Settings::GetColorConstant(EWorkspaceBorderColor));
+	SetInnerColor(Settings::GetColorConstant(EWorkspaceInnerColor));
+	iWorkspaceSnapshot = new CWorkspaceSnapshot(parent,this,QPointF(10,10/*+CWorkspaceExplorer::GetInstance()->GetPosition().y()*/), QPointF(100,100));
 }
 
 void CWorkspace::resizeEvent(QSize size){
@@ -56,9 +54,14 @@ void CWorkspace::paint(QPainter* painter, QRect position){
 		QPainter *qpainter = new QPainter();
 		qpainter->begin((QPaintDevice*)iWorkspaceImage);
 		cimage->paint(qpainter);
+		if(iActiveImage==cimage)
+		{
+			cimage->DrawSelection(qpainter);
+		}
 		qpainter->end();
 	}
 	painter->drawImage(position,*iWorkspaceImage);
+	DrawBorderRect(painter);
 }
 
 void CWorkspace::mousePressEvent(QMouseEvent *event){
@@ -169,4 +172,9 @@ void CWorkspace::SetGeometry(float x, float y, float w, float h)
 	}
 	//UpdateTexture();
 	
+}
+
+CWorkspaceSnapshot& CWorkspace::GetSnapshot()
+{
+	return *iWorkspaceSnapshot;
 }

@@ -2,6 +2,8 @@
 #include <cworkspace.h>
 #include <workspacemanager.h>
 #include <cimageexplorer.h>
+#include <cworkspaceexplorer.h>
+#include <settings.h>
 
 CWidget *CWidget::instance = NULL;
 
@@ -11,15 +13,20 @@ CWidget::CWidget(QWidget *parent){
 	SetGeometry(0,0,500,500);
 	//iPixmap = new QPixmap(this->width(),this->height());
 	//setPixmap(*iPixmap);
+	QPointF workspaceExplorerPos(0,this->height()-Settings::imageExplorerSize);
+	QPointF workspaceExplorerSize(this->width(),Settings::imageExplorerSize);
+	iWorkspaceExplorer = CWorkspaceExplorer::InitInstance(this, workspaceExplorerPos,workspaceExplorerSize);
 	
-	CWorkspace *workspace = new CWorkspace(this,QPointF(0,0),QPointF(this->width()*4/5,this->height()*4/5));
+	CWorkspace *workspace = new CWorkspace(this,QPointF(0,0),QPointF(this->width()-Settings::imageExplorerSize,this->height()-Settings::imageExplorerSize));
 	CWorkspaceManager::InitInstance();
-	CWorkspaceManager::GetInstance()->SetActiveWorkspace(workspace);
+	//CWorkspaceManager::GetInstance()->SetActiveWorkspace(workspace);
+	CWorkspaceManager::GetInstance()->AddWorkspace(workspace);
 
-	QPointF imageExplorerPos(this->width()*4/5,0);
-	QPointF imageExplorerSize(this->width()*1/5,this->height()*4/5);
+	QPointF imageExplorerPos(this->width()-Settings::imageExplorerSize,0);
+	QPointF imageExplorerSize(150,this->height()-Settings::imageExplorerSize);
 	CImageExplorer::InitInstance(this, imageExplorerPos,imageExplorerSize);
 	iImageExplorer = CImageExplorer::GetInstance();
+	LoadIcons();
 
 }
 
@@ -55,17 +62,16 @@ void CWidget::SetGeometry(int x, int y, int w, int h)
 		height=1;
 	}					
 
-	QPoint imageExplorerPos(this->width()*4/5,0);
-	QPoint imageExplorerSize(this->width()-imageExplorerPos.x(),this->height()*4/5);
+	QPoint imageExplorerPos(this->width()-Settings::imageExplorerSize,0);
+	QPoint imageExplorerSize(this->width()-imageExplorerPos.x(),this->height()-Settings::imageExplorerSize);
 	iImageExplorer->SetGeometry(imageExplorerPos.x(),imageExplorerPos.y(),imageExplorerSize.x(),imageExplorerSize.y());
 
-	//QPoint workspaceExplorerPos(0,this->height()*4/5);
-	//QPoint workspaceExplorerSize(this->width(),this->height()-workspaceExplorerPos.y());
-
-	//iWorkspaceExplorer->SetGeometry(workspaceExplorerPos.x(),workspaceExplorerPos.y(),workspaceExplorerSize.x(),workspaceExplorerSize.y());;
+	QPoint workspaceExplorerPos(0,this->height()-Settings::imageExplorerSize);
+	QPoint workspaceExplorerSize(this->width(),this->height()-workspaceExplorerPos.y());
+	iWorkspaceExplorer->SetGeometry(workspaceExplorerPos.x(),workspaceExplorerPos.y(),workspaceExplorerSize.x(),workspaceExplorerSize.y());;
 
 	QPoint workspacePos(0,0);
-	QPoint workspaceSize(this->width()*4/5,this->height()*4/5);
+	QPoint workspaceSize(this->width()-Settings::imageExplorerSize,this->height()-Settings::imageExplorerSize);
 
 	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->SetGeometry(workspacePos.x(),workspacePos.y(),
 		workspaceSize.x(),workspaceSize.y());
@@ -147,8 +153,9 @@ void CWidget::paint(){
 	iWidgetImage->fill(0);
 	QPainter *qpainter=new QPainter();
 	qpainter->begin(iWidgetImage);
-	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->paint(qpainter,QRect(QPoint(0,0),QPoint(this->width()*4/5,this->height()*4/5)));
+	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->paint(qpainter,QRect(QPoint(0,0),QPoint(this->width()-Settings::imageExplorerSize,this->height()-Settings::imageExplorerSize)));
 	CImageExplorer::GetInstance()->paint(qpainter); // pridat qrect
+	CWorkspaceExplorer::GetInstance()->paint(qpainter);
 	qpainter->end();
 	iPixmap->convertFromImage(*iWidgetImage);
 	setPixmap(*iPixmap);
@@ -187,4 +194,31 @@ const int CWidget::height() {
 }
 const int CWidget::width() {
 	return QLabel::width();
+}
+
+void CWidget::LoadIcons()
+{
+	iImageMoveIcon = new QImage(Settings::MoveIconFileName);
+	iImageResizeIcon = new QImage(Settings::ResizeIconFileName);
+	iImageCloseIcon = new QImage(Settings::CloseIconFileName);
+}
+
+QImage* CWidget::getIcon(TIconType type)
+{
+	switch (type)
+	{
+		case TIconType::CloseIcon: return iImageCloseIcon;
+			break;
+		case TIconType::MoveIcon: return iImageMoveIcon;
+			break;
+		case TIconType::ResizeIcon: return iImageResizeIcon;
+			break;
+		default: ;
+			break;
+	}
+}
+
+QPointF CWidget::GetDefaultWorkspaceSize()
+{
+	return QPointF(this->width()-Settings::imageExplorerSize,this->height()-Settings::imageExplorerSize);
 }

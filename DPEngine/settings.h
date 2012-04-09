@@ -1,6 +1,7 @@
 #ifndef _SETTINGS_H_SADASWDFNMKIO
 #define _SETTINGS_H_SADASWDFNMKIO
 #include <exception>
+#include <QtCore/QString>
 
 typedef struct 
 {
@@ -34,7 +35,7 @@ typedef enum
 	EWorkspaceBorders,
 	EWorkspaceBorderColor,
 	EWorkspaceInnerColor,
-EWorkspaceSnapshotBorders,
+	EWorkspaceSnapshotBorders,
 	EWorkspaceSnapshotBorderColor,
 	EWorkspaceSnapshotInnerColor,
 	EWorkspaceExplorerTextColor,
@@ -51,6 +52,12 @@ public:
 	static TBorders GetBordersConstant(TSettingConstants constant);
 	static TColor GetColorConstant(TSettingConstants constant);
 	static int iconSize;
+	static int imageExplorerSize;
+	static int imageWindowingCenterSensitivity;
+	static int imageWindowingWidthSensitivity;
+	static QString MoveIconFileName;
+	static QString CloseIconFileName;
+	static QString ResizeIconFileName;
 protected:
 	Settings();
 private:

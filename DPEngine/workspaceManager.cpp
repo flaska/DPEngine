@@ -1,4 +1,5 @@
 #include <workspaceManager.h>
+#include <cworkspaceexplorer.h>
 #include <cwidget.h>
 //#include <glWorkspaceSnapshot.h>
 CWorkspaceManager* CWorkspaceManager::instance = NULL;
@@ -24,11 +25,11 @@ CGLPlanarWorkspace *CWorkspaceManager::GetPlanarWorkspace()
 {
 	return iPlanarWorkspace;
 }
-
-QList<CGLWorkspace*>& CWorkspaceManager::GetWorkspaces()
+*/
+QList<CWorkspace*>& CWorkspaceManager::GetWorkspaces()
 {
 	return iWorkspaces;
-}
+}/*
 void CWorkspaceManager::RemoveWorkspace(CGLWorkspace*workspace)
 {
 	if (iWorkspaces.contains(workspace))
@@ -68,37 +69,37 @@ void CWorkspaceManager::RemoveWorkspace(CGLWorkspace*workspace)
 	}
 	
 }
-
-void CWorkspaceManager::AddWorkspace(CGLWorkspace *workspace){
-	if(!CGLWorkspaceExplorer::GetInstance())
+*/
+void CWorkspaceManager::AddWorkspace(CWorkspace *workspace){
+	if(!CWorkspaceExplorer::GetInstance())
 	return;
 	QString jk;
-	QListIterator<CGLWorkspace*> workspaces(iWorkspaces);
+	QListIterator<CWorkspace*> workspaces(iWorkspaces);
 	workspaces.toBack();
-	CGLWorkspace *lastWorkspace = NULL;
+	CWorkspace *lastWorkspace = NULL;
 	if(workspaces.hasPrevious())
 	{
 		lastWorkspace= workspaces.previous();
 	}
 
-	QPointF pos=CGLWorkspaceExplorer::GetInstance()->GetDefaultWorkspaceSnapshotPos();
-	QPointF size=CGLWorkspaceExplorer::GetInstance()->GetDefaultWorkspaceSnapshotSize();
+	QPointF pos=CWorkspaceExplorer::GetInstance()->GetDefaultWorkspaceSnapshotPos();
+	QPointF size=CWorkspaceExplorer::GetInstance()->GetDefaultWorkspaceSnapshotSize();
 	if(lastWorkspace)
 	{
-		pos=lastWorkspace->GetSnapshot().GetPosition();
-		pos.setX(pos.x()+lastWorkspace->GetSnapshot().GetSize().x());
-		size=lastWorkspace->GetSnapshot().GetSize();
+//		pos=lastWorkspace->GetSnapshot().GetPosition();
+//		pos.setX(pos.x()+lastWorkspace->GetSnapshot().GetSize().x());
+//		size=lastWorkspace->GetSnapshot().GetSize();
 	}
 	iWorkspaces.append(workspace);
-	workspace->GetSnapshot().SetSize(size);  //fail
-	workspace->GetSnapshot().SetPosition(pos); //fail
+//	workspace->GetSnapshot().SetSize(size);  //fail
+//	workspace->GetSnapshot().SetPosition(pos); //fail
 
 	if(iActiveWorkspace==NULL)
 	{
 		iActiveWorkspace = workspace;
 	}
 }
-
+/*
 void CWorkspaceManager::CreatePlanarWorkspace(CGLPlanarWorkspace *workspace){
 	if(!CGLWorkspaceExplorer::GetInstance())
 	return;

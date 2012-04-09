@@ -32,11 +32,12 @@ public:
 	//void AddWorkspace(CGLWorkspace *workspace);
 	//void CreatePlanarWorkspace(CGLPlanarWorkspace *workspace);
 	//void RemoveWorkspace(CGLWorkspace*workspace);
-	//QList<CGLWorkspace*> &GetWorkspaces();
+	QList<CWorkspace*> &GetWorkspaces();
 	//bool PlanarWorkspaceExists();
+	void AddWorkspace(CWorkspace *workspace);
 private:
 	CWorkspace *iActiveWorkspace;
-	//QList<CGLWorkspace*> iWorkspaces;
+	QList<CWorkspace*> iWorkspaces;
 	//static CGLObject *iParent;
 	//CGLPlanarWorkspace *iPlanarWorkspace;
 };

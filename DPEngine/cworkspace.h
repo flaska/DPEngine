@@ -4,9 +4,11 @@
 #include <cimage.h>
 #include <cobject.h>
 #include <workspacelayout.h>
+#include <cworkspacesnapshot.h>
 
 class CImage;
 class MWorkspaceLayout;
+class CWorkspaceSnapshot;
 class CWorkspace : public CObject {
 public:
 	CWorkspace();
@@ -21,6 +23,7 @@ public:
 	void SelectImage(CImage *image);
 	void RemoveImage(CImage *image);
 	void SetGeometry(float x, float y, float w, float h);
+	CWorkspaceSnapshot& GetSnapshot();
 //private:
 	MWorkspaceLayout *iLayout;
 	QImage* iWorkspaceImage;
@@ -29,5 +32,6 @@ public:
 	void resizeEvent(QSize size);
 	float iLastInnerHeight;
 	float iLastInnerWidth;
+	CWorkspaceSnapshot* iWorkspaceSnapshot;
 };
 #endif

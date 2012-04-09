@@ -78,8 +78,6 @@ void CObject::resizeGL()
 
 void CObject::DrawInnerRect(QPainter* painter)
 {
-
-	//glColor4f(iInnerColor.r,iInnerColor.g,iInnerColor.b,iInnerColor.a);
 	const QRect& r =GetInnerRect();
 	int rheight=r.height();
 	int rtop=r.top();
@@ -112,11 +110,12 @@ TColor CObject::GetInnerColor()
 
 void CObject::DrawIcons(QPainter* painter){
 	float opaq = 0.5;
-	if(iMoveAbility  )
+	if(iMoveAbility )
 	{
 		painter->setPen(QPen(QColor(255,0,0)));
 		QPoint position(iMoveIcon.position.x()+GetPosition().x(),iMoveIcon.position.y()+GetPosition().y());
 		painter->drawRect(QRect(position,QSize(iMoveIcon.size.x(),iMoveIcon.size.y())));
+		painter->drawImage(QRect(position,QSize(iMoveIcon.size.x(),iMoveIcon.size.y())),*CWidget::GetInstance()->getIcon(TIconType::MoveIcon));
 
 	}
 	//Resize icon
@@ -125,8 +124,7 @@ void CObject::DrawIcons(QPainter* painter){
 		painter->setPen(QPen(QColor(255,0,0)));
 		QPoint position(iResizeIcon.position.x()+GetPosition().x(),iResizeIcon.position.y()+GetPosition().y());
 		painter->drawRect(QRect(position,QSize(iResizeIcon.size.x(),iResizeIcon.size.y())));
-		std::cout << "Resize Icon Visual Position LT: x" << position.x() << " y " << position.y() << std::endl;
-		std::cout << "Resize Icon Visual Position RB: x" << position.x() +  iCloseIcon.size.x() << " y " << position.y() + iCloseIcon.size.y() << std::endl;
+		painter->drawImage(QRect(position,QSize(iMoveIcon.size.x(),iMoveIcon.size.y())),*CWidget::GetInstance()->getIcon(TIconType::ResizeIcon));
 		
 	}
 	//Close icon
@@ -135,6 +133,7 @@ void CObject::DrawIcons(QPainter* painter){
 		painter->setPen(QPen(QColor(255,0,0)));
 		QPoint position(iCloseIcon.position.x()+GetPosition().x(),iCloseIcon.position.y()+GetPosition().y());
 		painter->drawRect(QRect(position,QSize(iCloseIcon.size.x(),iCloseIcon.size.y())));
+		painter->drawImage(QRect(position,QSize(iMoveIcon.size.x(),iMoveIcon.size.y())),*CWidget::GetInstance()->getIcon(TIconType::CloseIcon));
 	}
 }
 
@@ -208,84 +207,17 @@ bool CObject::IsOnMoveIcon(int x, int y)
 	return true;
 }
 
-void CObject::DrawSelection()
+void CObject::DrawSelection(QPainter* painter)
 {
-/*	glDisable(GL_BLEND);
-	glColor4f(0.5,1,1,1);
-	glRectf(0,0,
-		GetBorders().left,
-		GetSize().y());
-	glRectf(0,0,
-		GetSize().x(),
-		GetBorders().bottom);
-
-	glRectf(GetSize().x()-GetBorders().right,
-		0,
-		GetSize().x(),
-		GetSize().y());
-	
-	glRectf(0,
-		GetSize().y()-GetBorders().top,
-		GetSize().x(),
-		GetSize().y());
-
-	glColor4f(0.9,0.9,0.9,1);
-	glRectf(0,0,
-		1,
-		GetSize().y());
-	glRectf(0,0,
-		GetSize().x(),
-		1);
-
-	glRectf(GetSize().x()-1,
-		0,
-		GetSize().x(),
-		GetSize().y());
-	
-	glRectf(0,
-		GetSize().y()-1,
-		GetSize().x(),
-		GetSize().y());
-	glEnable(GL_BLEND);*/
-	/*
-	glEnable(GL_BLEND);
-	glColor4f(0.5,1,1,0.1);
-	glRectf(GetBorders().left,GetBorders().bottom
-		,
-		GetSize().x()-GetBorders().right,
-		GetSize().y()-GetBorders().top);
-	glDisable(GL_BLEND);
-	*/
+	QPen pen(Qt::green, (GetBorders().bottom+GetBorders().left+GetBorders().right+GetBorders().top)/4, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	painter->setPen(pen);
+	painter->drawRect(QRect(QPoint(GetPosition().x()+GetBorders().left/2,GetPosition().y()+GetBorders().top/2),QPoint(GetPosition().x()+GetSize().x()-GetBorders().right/2,GetPosition().y()+GetSize().y()-GetBorders().bottom/2)));
 }
-void CObject::DrawBorderRect()
+void CObject::DrawBorderRect(QPainter* painter)
 {
-	// nahrat jednotkovou matici
-
-	//glColor4f(iBorderColor.r,iBorderColor.g,iBorderColor.b,iBorderColor.a);
-	//glRectf(0,0,iSize.x(),iSize.y());
-	/*	glBegin(GL_LINES);
-	glVertex2i(0,0);
-	glVertex2i(iSize.x(),0);
-	glVertex2i(0,1);
-	glVertex2i(iSize.x(),1);
-
-
-	glVertex2i(iSize.x(),0);
-	glVertex2i(iSize.x(),iSize.y()-1);
-	glVertex2i(iSize.x()-1,0);
-	glVertex2i(iSize.x()-1,iSize.y()-1);
-
-	glVertex2i(iSize.x(),iSize.y()-1);
-	glVertex2i(0,iSize.y()-1);
-	glVertex2i(iSize.x(),iSize.y()-2);
-	glVertex2i(0,iSize.y()-2);
-
-	glVertex2i(0,iSize.y()-1);
-	glVertex2i(0,0);
-	glVertex2i(1,iSize.y()-1);
-	glVertex2i(1,0);
-	glEnd();
-	*/
+	QPen pen(Qt::gray, (GetBorders().bottom+GetBorders().left+GetBorders().right+GetBorders().top)/4, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	painter->setPen(pen);
+	painter->drawRect(QRect(QPoint(GetPosition().x()+GetBorders().left/2,GetPosition().y()+GetBorders().top/2),QPoint(GetPosition().x()+GetSize().x()-GetBorders().right/2,GetPosition().y()+GetSize().y()-GetBorders().bottom/2)));
 }
 
 //set matrix to start position of object

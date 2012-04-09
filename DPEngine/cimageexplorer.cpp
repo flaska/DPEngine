@@ -279,12 +279,12 @@ bool CImageExplorer::IsOnResizeIcon(int x, int y)
 		return false;
 	return true;
 }
-
+*/
 void CImageExplorer::SetGeometry(int x, int y, int width, int height)
 {
 	QPointF oldPos = iPosition;
 	QPointF oldSize = iSize;
-	CGLObject::SetGeometry(x,y,width,height);
+	CObject::SetGeometry(x,y,width,height);
 	iScrollBar->setGeometry (
 		iPosition.x()+iSize.x()-15-GetBorders().right,
 		iPosition.y()+GetBorders().top,
@@ -310,7 +310,7 @@ void CImageExplorer::SetGeometry(int x, int y, int width, int height)
 
 	}
 }
-
+/*
 
 void CImageExplorer::wheelEvent(QWheelEvent *event)
 {
@@ -380,12 +380,13 @@ void CImageExplorer::paint(QPainter *painter)
 	{
 		CImage *cimage = images.next();
 		imageHeightSum += cimage->GetSize().y();
-//		if(cimage->GetPosition().y()+cimage->GetSize().y()>0 
-//			&& cimage->GetPosition().y()<=iSize.y())
+		if(cimage->GetPosition().y()+cimage->GetSize().y()>0 
+			&& cimage->GetPosition().y()<=iSize.y())
 		{
 			cimage->paint(painter);
 		}
 	}
+	DrawBorderRect(painter);
 }
 
 void CImageExplorer::CloseImage(CImage *image)
@@ -421,34 +422,4 @@ void CImageExplorer::CloseImage(CImage *image)
 	{
 		CInfoPanel::GetInstance()->SetImageExplorerInfoView();
 	}*/
-}
-
-void CImageExplorer::SetGeometry(int x, int y, int width, int height)
-{
-	QPointF oldPos = iPosition;
-	QPointF oldSize = iSize;
-	CObject::SetGeometry(x,y,width,height);
-	iScrollBar->setGeometry (
-		iPosition.x()+iSize.x()-15-GetBorders().right,
-		iPosition.y()+GetBorders().top,
-		15,
-		iPosition.y()+iSize.y()-GetBorders().top-GetBorders().bottom
-		);
-	QListIterator<CImage*> images(iImages);
-	int posy;
-	if(images.hasNext())
-	{
-		posy=images.next()->GetPosition().y();
-	}
-	images.toFront();
-	while(images.hasNext())
-	{
-		CImage* im = images.next();
-		int width = iSize.x()-GetBorders().right-GetBorders().left-iScrollBar->size().width();
-		QPoint size(width,width);
-		int posx=iPosition.x()+GetBorders().left;
-		im->SetGeometry(posx,posy, size.x(),size.y());
-		posy+=size.y();
-
-	}
 }
