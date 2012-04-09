@@ -31,7 +31,7 @@ public:
 	void SetActiveWorkspace(CWorkspace *workspace);
 	//void AddWorkspace(CGLWorkspace *workspace);
 	//void CreatePlanarWorkspace(CGLPlanarWorkspace *workspace);
-	//void RemoveWorkspace(CGLWorkspace*workspace);
+	void RemoveWorkspace(CWorkspace*workspace);
 	QList<CWorkspace*> &GetWorkspaces();
 	//bool PlanarWorkspaceExists();
 	void AddWorkspace(CWorkspace *workspace);

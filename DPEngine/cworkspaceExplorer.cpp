@@ -118,7 +118,7 @@ void CWorkspaceExplorer::DrawSelection()
 	if(!CWorkspaceManager::GetInstance()->GetActiveWorkspace())
 		return;
 //TODO	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->GetSnapshot().Translate();
-//TODO	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->GetSnapshot().DrawSelection();
+//	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->GetSnapshot().DrawSelection();
 }
 void CWorkspaceExplorer::DrawIcons()
 {
@@ -444,7 +444,6 @@ void CWorkspaceExplorer::mouseMoveEvent(QMouseEvent *event)
 }
 void CWorkspaceExplorer::mousePressEvent(QMouseEvent *event)
 {
-	//iActiveWorkspace = NULL;
 	if(!CWorkspaceManager::GetInstance())
 		return;
 //	if(!CInfoPanel::GetInstance())
@@ -455,10 +454,9 @@ void CWorkspaceExplorer::mousePressEvent(QMouseEvent *event)
 	while (workspaces.hasPrevious())
 	{
 		CWorkspace* obj = workspaces.previous();
-//		if(obj->GetSnapshot().IsPointOnObject(event->x(),event->y()))
+		if(obj->GetSnapshot().IsPointOnObject(event->x(),event->y()))
 		{
-			//	iActiveWorkspace = obj;
-//			obj->GetSnapshot().mousePressEvent(event);
+			obj->GetSnapshot().mousePressEvent(event);
 			return;
 		}
 	}

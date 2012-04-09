@@ -88,42 +88,8 @@ CImageExplorer::CImageExplorer(CWidget *parentWindow, QPointF& position, QPointF
 	SetBorderColor(Settings::GetColorConstant(EImageExplorerBorderColor));
 	SetInnerColor(Settings::GetColorConstant(EImageExplorerInnerColor));
 }
-/*
-void CImageExplorer::CloseImage(CImage *image)
-{
-	if(!(iImages.contains(image)))
-	{
-		return;
-	}
-	QListIterator<CImage*> images(iImages);
-	bool bRemoved=false;
-	int posy=0;
-	while(images.hasNext())
-	{
-		CImage* im=images.next();
-		if(im==image)
-		{
-			bRemoved=true;
-			posy=im->GetPosition().y();
 
-		}
-		else if(bRemoved)
-		{
-			int lastpos = im->GetPosition().y();
-			im->SetPosition(QPoint(im->GetPosition().x(),posy));
-			posy=lastpos;
-		}
-	}
-	if(iImages.contains(image))
-	{
-		iImages.removeOne(image);
-	}
-	if(CInfoPanel::GetInstance())
-	{
-		CInfoPanel::GetInstance()->SetImageExplorerInfoView();
-	}
-}
-*/
+
 
 void CImageExplorer::OpenImage(QString &fileName)
 {
@@ -353,13 +319,10 @@ void CImageExplorer::mousePressEvent(QMouseEvent *event)
 		{
 			obj->mousePressEvent(event);
 			SelectImage(obj);
-
+				/* DEMO */
+			if (iActiveImage){ CImage *image = iActiveImage->CreateDerivedImage(/*EImageOrientationAxial*/);
+			CWorkspaceManager::GetInstance()->GetActiveWorkspace()->addImage(image);}
 	/* DEMO */
-		CImage *image = CImageExplorer::GetInstance()->iActiveImage->CreateDerivedImage(/*EImageOrientationAxial*/);
-		CWorkspaceManager::GetInstance()->GetActiveWorkspace()->addImage(image);
-	/* DEMO */
-
-
 			break;
 		}
 	}

@@ -91,7 +91,6 @@ void CWidget::SetGeometry(int x, int y, int w, int h)
 
 void CWidget::mousePressEvent(QMouseEvent *event)
 {
-	std::cout << "Mouse X " << event->x() << "Mouse Y " << event->y() << std::endl;
 	iActiveObject = NULL;
 	//TODO 
 	if(CImageExplorer::GetInstance()){
@@ -101,22 +100,22 @@ void CWidget::mousePressEvent(QMouseEvent *event)
 			paint();
 			return;
 		}
-	}/*
-	if(CGLWorkspaceExplorer::GetInstance())
+	}
+	if(CWorkspaceExplorer::GetInstance())
 	{
-		if(CGLWorkspaceExplorer::GetInstance()->IsPointOnObject(event->x(),event->y()))
+		if(CWorkspaceExplorer::GetInstance()->IsPointOnObject(event->x(),event->y()))
 		{
 			iActiveObject  = iWorkspaceExplorer;
 			iWorkspaceExplorer->mousePressEvent(event);
-			updateGL ();
+			paint();
 			return;
 		}
-	}*/
+	}
 	if(CWorkspaceManager::GetInstance())
 	{
 		if(CWorkspaceManager::GetInstance()->GetActiveWorkspace())
 		{
-//TODO			if(CWorkspaceManager::GetInstance()->GetActiveWorkspace()->IsPointOnObject(event->x(),event->y()))
+			if(CWorkspaceManager::GetInstance()->GetActiveWorkspace()->IsPointOnObject(event->x(),event->y()))
 			{
 				iActiveObject  = CWorkspaceManager::GetInstance()->GetActiveWorkspace();
 				iActiveObject->mousePressEvent(event);

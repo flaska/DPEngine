@@ -4,6 +4,7 @@
 #include <dicom3DTextureManager.h>
 #include <settings.h>
 #include <cimageexplorer.h>
+#include <workspacemanager.h>
 
 
 void CImage::setImageFromFile(QString filename){
@@ -475,7 +476,7 @@ CImage* CImage::CreateDerivedImage(/*TImageAxisOrientation orientation*/)
 	CImage *newImage;
 //	try
 //	{
-		newImage = new CImage(NULL/*CWorkspaceManager::GetInstance()->GetActiveWorkspace()*/,
+		newImage = new CImage(CWorkspaceManager::GetInstance()->GetActiveWorkspace(),
 			C3DTextureManager::GetInstance()->GetTexture(this->GetTexture()->GetIdentificationString()),pos,size);
 //	}
 /*TODO	catch(DicomFramesException &e)
@@ -493,7 +494,7 @@ CImage* CImage::CreateDerivedImage(/*TImageAxisOrientation orientation*/)
 	QString name("Im:");
 	//TODOname.append(QString::number(iDerivedImages.count()));
 	//newImage->SetName(name);
-	//iDerivedImages.append(newImage);
+	iDerivedImages.append(newImage);
 	//newImage->SetOrientation(orientation);
 	return newImage;
 }

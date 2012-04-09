@@ -29,8 +29,8 @@ CGLPlanarWorkspace *CWorkspaceManager::GetPlanarWorkspace()
 QList<CWorkspace*>& CWorkspaceManager::GetWorkspaces()
 {
 	return iWorkspaces;
-}/*
-void CWorkspaceManager::RemoveWorkspace(CGLWorkspace*workspace)
+}
+void CWorkspaceManager::RemoveWorkspace(CWorkspace*workspace)
 {
 	if (iWorkspaces.contains(workspace))
 	{
@@ -51,17 +51,17 @@ void CWorkspaceManager::RemoveWorkspace(CGLWorkspace*workspace)
 		workspace=NULL;
 	}
 	//rearange workspace snapshots
-	QListIterator<CGLWorkspace*> workspaces(iWorkspaces);
+	QListIterator<CWorkspace*> workspaces(iWorkspaces);
 	workspaces.toFront();
 	
 
-	QPoint pos=CGLWorkspaceExplorer::GetInstance()->GetDefaultWorkspaceSnapshotPos();
-	QPoint size=CGLWorkspaceExplorer::GetInstance()->GetDefaultWorkspaceSnapshotSize();
+	QPoint pos=CWorkspaceExplorer::GetInstance()->GetDefaultWorkspaceSnapshotPos();
+	QPoint size=CWorkspaceExplorer::GetInstance()->GetDefaultWorkspaceSnapshotSize();
 	int lastx = pos.x();
 	while(workspaces.hasNext())
 	{
 		
-		CGLWorkspace* ws = workspaces.next();
+		CWorkspace* ws = workspaces.next();
 		pos.setX(lastx);
 		lastx=pos.x()+size.x();
 		ws->GetSnapshot().SetSize(size);
@@ -69,7 +69,7 @@ void CWorkspaceManager::RemoveWorkspace(CGLWorkspace*workspace)
 	}
 	
 }
-*/
+
 void CWorkspaceManager::AddWorkspace(CWorkspace *workspace){
 	if(!CWorkspaceExplorer::GetInstance())
 	return;
