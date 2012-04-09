@@ -222,3 +222,37 @@ QPointF CWidget::GetDefaultWorkspaceSize()
 {
 	return QPointF(this->width()-Settings::imageExplorerSize,this->height()-Settings::imageExplorerSize);
 }
+
+QPointF CWidget::GetDefaultWorkspacePosition()
+{
+	return QPointF(0,0);
+}
+
+void CWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+	iActiveObject = NULL;
+	if(iImageExplorer->IsPointOnObject(event->x(),event->y()))
+	{
+		iActiveObject  = iImageExplorer;
+		//iImageExplorer->mouseDoubleClickEvent(event);
+		paint ();
+		return;
+	}
+	if(iWorkspaceExplorer->IsPointOnObject(event->x(),event->y()))
+	{
+		iActiveObject  = iWorkspaceExplorer;
+		iWorkspaceExplorer->mouseDoubleClickEvent(event);
+		paint();
+		return;
+	}
+	if(CWorkspaceManager::GetInstance()->GetActiveWorkspace())
+	{
+		if(CWorkspaceManager::GetInstance()->GetActiveWorkspace()->IsPointOnObject(event->x(),event->y()))
+		{
+			iActiveObject  = CWorkspaceManager::GetInstance()->GetActiveWorkspace();
+			//iActiveObject->mouseDoubleClickEvent(event);
+			paint();
+			return;
+		}
+	}
+}

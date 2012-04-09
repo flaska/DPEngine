@@ -282,7 +282,7 @@ void CWorkspaceExplorer::SetGeometry(int x, int y, int width, int height)
 	int posx;
 	if(workspaces.hasNext())
 	{
-//		posx=workspaces.next()->GetSnapshot().GetPosition().x();
+		posx=workspaces.next()->GetSnapshot().GetPosition().x();
 	}
 	workspaces.toFront();
 	while(workspaces.hasNext())
@@ -344,17 +344,11 @@ void CWorkspaceExplorer::AddNewWorkspace()
 {
 	if(!CWidget::GetInstance())
 		return;
-	CWidget* glwidget =CWidget::GetInstance();
-//	try
-	{
-//		CWorkspace *newWorkspace = new CWorkspace(glwidget,glwidget->GetDefaultWorkspacePosition(),glwidget->GetDefaultWorkspaceSize());
-//		CWorkspaceManager::GetInstance()->AddWorkspace(newWorkspace);
-//		SelectWorkspace(newWorkspace);
-	}
-//	catch (TextureNotCreatedException &e)
-	{
-		//workspace not created
-	}
+	CWidget* cwidget =CWidget::GetInstance();
+
+	CWorkspace *newWorkspace = new CWorkspace(cwidget,cwidget->GetDefaultWorkspacePosition(),cwidget->GetDefaultWorkspaceSize());
+	CWorkspaceManager::GetInstance()->AddWorkspace(newWorkspace);
+	SelectWorkspace(newWorkspace);
 }/*
 void CGLWorkspaceExplorer::CreateNewPlanarWorkspace()
 {

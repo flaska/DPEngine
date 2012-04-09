@@ -15,6 +15,7 @@ public:
 	CWidget(QWidget *parent);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
+	void mouseDoubleClickEvent(QMouseEvent *event);
 	void paint();
 	static CWidget *GetInstance();
 	static CWidget* InitInstance(QWidget *parent);
@@ -23,6 +24,7 @@ public:
 	void SetGeometry(int x, int y, int w, int h);
 	QPixmap* getWidgetImage();
 	QPointF GetDefaultWorkspaceSize();
+	QPointF GetDefaultWorkspacePosition();
 //private:
 	QPixmap* iPixmap;
 	static CWidget *instance;

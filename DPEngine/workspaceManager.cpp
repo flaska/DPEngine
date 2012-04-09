@@ -86,13 +86,13 @@ void CWorkspaceManager::AddWorkspace(CWorkspace *workspace){
 	QPointF size=CWorkspaceExplorer::GetInstance()->GetDefaultWorkspaceSnapshotSize();
 	if(lastWorkspace)
 	{
-//		pos=lastWorkspace->GetSnapshot().GetPosition();
-//		pos.setX(pos.x()+lastWorkspace->GetSnapshot().GetSize().x());
-//		size=lastWorkspace->GetSnapshot().GetSize();
+		pos=lastWorkspace->GetSnapshot().GetPosition();
+		pos.setX(pos.x()+lastWorkspace->GetSnapshot().GetSize().x());
+		size=lastWorkspace->GetSnapshot().GetSize();
 	}
 	iWorkspaces.append(workspace);
-//	workspace->GetSnapshot().SetSize(size);  //fail
-//	workspace->GetSnapshot().SetPosition(pos); //fail
+	workspace->GetSnapshot().SetSize(size);  //fail
+	workspace->GetSnapshot().SetPosition(pos); //fail
 
 	if(iActiveWorkspace==NULL)
 	{
