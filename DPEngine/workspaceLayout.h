@@ -48,6 +48,7 @@ public:
 	virtual bool IsInRange(int a, int b, int tolerance);
 	virtual void Do()=0;//redo layou
 //	QList<CGLImage*>& GetImages();
+	virtual void resize(float sizeRatioX, float sizeRatioY);
 	
 protected:
 	CWorkspace *iParentWorkspace;

@@ -49,6 +49,7 @@ public:
 	* Called after user releaser mouse after moving object
 	*/
 	void ImageMoveFinished(CImage *image);
+	void resize(float sizeRatioX, float sizeRatioY);
 private:
 	TGrowingGridLayoutType iType;//type horizontal or vertical suitable
 	bool iToSwap;

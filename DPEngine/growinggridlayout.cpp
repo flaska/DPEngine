@@ -531,6 +531,29 @@ void CGrowingGridLayout::FitToGrid()
 		}
 	}
 }
+
+void CGrowingGridLayout::resize(float sizeRatioX, float sizeRatioY)
+{
+	for(int j=0;j<iRowCount;j++)
+	{
+		for(int i=0;i<iColumnCount;i++)
+		{
+			if(iImageGrid[i][j] != NULL)
+			{
+				QPoint defaultPosition(
+					iColumnLefts[i]*sizeRatioX,
+					iRowsTops[j]*sizeRatioY);
+				QPoint defaultSize(
+					iColumnWidths[i]*sizeRatioX,
+					iRowsHeights[j]*sizeRatioY);
+				iImageGrid[i][j]->SetPosition(defaultPosition);
+				iImageGrid[i][j]->SetSize(defaultSize);
+			}
+		}
+	}
+	Do();
+}
+
 /**
 * Called after user releaser mouse after moving object
 */

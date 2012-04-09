@@ -186,3 +186,7 @@ MWorkspaceLayout::~MWorkspaceLayout()
 	return false;
 }
 
+void MWorkspaceLayout::resize(float sizeRatioX, float sizeRatioY)
+{
+
+}

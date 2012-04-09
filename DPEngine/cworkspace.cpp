@@ -11,6 +11,7 @@
 CWorkspace::CWorkspace(CObject *parent, const QPointF &position, const QPointF &size):CObject(parent, position, size){
 	iLastInnerHeight = 0;
 	iLastInnerWidth = 0;
+	iLayout = NULL;
 	iWorkspaceImage = new QImage(size.x(),size.y(),QImage::Format_RGB32);
 	iWorkspaceImage->fill(Qt::yellow);
 	SetSize(QPointF(size.x(),size.y()));
@@ -171,6 +172,7 @@ void CWorkspace::SetGeometry(float x, float y, float w, float h)
 		im->SetGeometry(newPos.x(),newPos.y(), newSize.x(),newSize.y());
 	}
 	//UpdateTexture();
+	if (iLayout) iLayout->resize(sizeRatioX, sizeRatioY);
 	
 }
 
