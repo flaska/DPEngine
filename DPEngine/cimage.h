@@ -35,6 +35,7 @@ public:
 	void SetManipulated(TManipulationState manipulated);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
 	CImage* CreateDerivedImage(/*TImageAxisOrientation orientation*/);
 	CImage *GetOwner();
 	void SetOwner(CImage *owner);

@@ -75,7 +75,7 @@ void CWidget::SetGeometry(int x, int y, int w, int h)
 
 	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->SetGeometry(workspacePos.x(),workspacePos.y(),
 		workspaceSize.x(),workspaceSize.y());
-	/*QListIterator<CWorkspace*> workspaces((CWorkspaceManager::GetInstance()->GetWorkspaces()));
+	QListIterator<CWorkspace*> workspaces((CWorkspaceManager::GetInstance()->GetWorkspaces()));
 	workspaces.toFront();
 	while(workspaces.hasNext())
 	{
@@ -83,7 +83,7 @@ void CWidget::SetGeometry(int x, int y, int w, int h)
 		ws->SetGeometry(workspacePos.x(),workspacePos.y(),
 		workspaceSize.x(),workspaceSize.y());
 	}
-	CGLObject::resizeGL();*/
+	//CGLObject::resizeGL();
 	paint();
 }
 
@@ -152,7 +152,9 @@ void CWidget::paint(){
 	iWidgetImage->fill(0);
 	QPainter *qpainter=new QPainter();
 	qpainter->begin(iWidgetImage);
-	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->paint(qpainter,QRect(QPoint(0,0),QPoint(this->width()-Settings::imageExplorerSize,this->height()-Settings::imageExplorerSize)));
+	if (CWorkspaceManager::GetInstance()->GetActiveWorkspace()) {
+		CWorkspaceManager::GetInstance()->GetActiveWorkspace()->paint(qpainter,QRect(QPoint(0,0),QPoint(this->width()-Settings::imageExplorerSize,this->height()-Settings::imageExplorerSize)));
+	}
 	CImageExplorer::GetInstance()->paint(qpainter); // pridat qrect
 	CWorkspaceExplorer::GetInstance()->paint(qpainter);
 	qpainter->end();

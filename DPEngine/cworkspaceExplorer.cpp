@@ -201,8 +201,9 @@ void CWorkspaceExplorer::paint(QPainter* painter)
 		return;
 	//CWidget::GetInstance()->resetGLView();
 	//Translate();
-	DrawBorderRect(painter);	
-	//DrawInnerRect(painter);
+	
+	DrawInnerRect(painter);
+	DrawBorderRect(painter);
 
 	int snapWidthSum = 0;
 	//glDisable(GL_BLEND);

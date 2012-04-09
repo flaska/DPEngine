@@ -92,7 +92,6 @@ void CImage::PrepareSlice(){
 			imageLine[x]=qRgb(newintensity,newintensity,newintensity);
 		}
 	}
-	//std::cout << "iBias" << iBias << std::endl;
 	if (iActualSliceCompleteImage)
 		delete iActualSliceCompleteImage;
 	iActualSliceCompleteImage = new QImage(img);
@@ -144,8 +143,8 @@ void CImage::SetGeometry(float x, float y, float width, float height)
 	float oldCenterY = oldCenter.y()*oldHeight;
 	float oldDifX = oldCenterX-(float)oldWidth/2;
 	float oldDifY = oldCenterY-(float)oldHeight/2;
-	float newDifX = oldDifX /** (float)(oldWidth/width);*/;
-	float newDifY = oldDifY /** (float)(oldHeight/height)*/;
+	float newDifX = oldDifX;
+	float newDifY = oldDifY;
 	iImageCenter.setX((float)((float)width/2.+newDifX) / (float)width);
 	iImageCenter.setY((float)((float)height/2.+newDifY)/(float)height);
 	iSize.setX (width);
@@ -200,8 +199,7 @@ void CImage::Init(CObject *parentWindow, QPointF& position, QPointF &size )
 	name.append("image");
 //TODO	SetName(name);
 	iManipulated = EManipNone;
-//TODO	CWidget::GetInstance()->makeCurrent();
-//TODO	iOwner = NULL;
+	iOwner = NULL;
 	iParentWorkspace=NULL;
 	iScale = 1.0;
 	iBias = 0.3;
@@ -226,7 +224,6 @@ void CImage::Init(CObject *parentWindow, QPointF& position, QPointF &size )
 	SetMoveability(true);
 	SetResizeability(true);
 	SetClosability(true);
-//TODO	SetOpenGLInterpolation(true);
 	SetBorders(Settings::GetBordersConstant(EImageBorders));
 	SetBorderColor(Settings::GetColorConstant(EImageBorderColor));
 	SetInnerColor(Settings::GetColorConstant(EImageInnerColor));
@@ -247,7 +244,7 @@ void CImage::SetZoom(float zoom)
 		//iLayout->PrepareImageToMove(iActiveImage);
 		//TODO iParentWorkspace->UpdateTexture();
 	}
-	//TODO CWidget::GetInstance()->paint();
+	CWidget::GetInstance()->paint();
 }
 
 CDicom3DTexture *CImage::GetTexture()
@@ -331,6 +328,23 @@ void CImage::mousePressEvent(QMouseEvent *event)
 		iMouseState = EMouseStateImageWindowLeveling;
 	}
 
+}
+
+void CImage::mouseReleaseEvent(QMouseEvent *event)
+{
+	if(iMouseState==EMouseStateObjectMoving && iParentWorkspace)
+	{
+		iParentWorkspace->GetLayout().ImageMoveFinished(this);
+	}
+	iManipulated=EManipNone;
+	CWidget::GetInstance()->paint();
+	/*if(CInfoPanel::GetInstance())
+	{
+		if(CInfoPanel::GetInstance()->GetSourceImage() == this)
+		{
+			CInfoPanel::GetInstance()->SetSourceImage(this);
+		}
+	}*/
 }
 
 void CImage::SetImageWindow(TImageWindow window)

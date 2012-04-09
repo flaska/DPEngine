@@ -451,8 +451,7 @@ default layout aligmnment
 */
 void CGrowingGridLayout::ImageMoved(CImage *image)
 {
-//TODO	image->SetManipulated(EManipDissalowed);
-	//ImageMovedAlignToWorkspace(image);
+	image->SetManipulated(EManipDissalowed);
 	ImageMovedAlignToOtherImages(image);
 	QPointF imageCurrentPos = image->GetPosition();
 	QPointF imageCurrentSize = image->GetSize();
@@ -467,7 +466,7 @@ void CGrowingGridLayout::ImageMoved(CImage *image)
 
 		if(iSwappedImage != image && iSwappedImage!=NULL)
 		{
-//TODO			iSwappedImage->SetManipulated(EManipNone);
+			iSwappedImage->SetManipulated(EManipNone);
 		}
 
 		iImageGrid[gridToPos.x()][gridToPos.y()]=iSwappedImage;
@@ -479,7 +478,6 @@ void CGrowingGridLayout::ImageMoved(CImage *image)
 	gridFromPos = FindGridPosition(image);
 	//set back current image coords
 	image->SetPosition(imageCurrentPos);
-	//image->SetSize(imageCurrentSize);
 	gridToPos.setX(-1);
 	while(images.hasNext())
 	{
@@ -540,13 +538,12 @@ void CGrowingGridLayout::ImageMoveFinished(CImage *image)
 {
 	if(iSwappedImage)
 	{
-//TODO		iSwappedImage->SetManipulated(EManipNone);
+		iSwappedImage->SetManipulated(EManipNone);
 	}
 	iSwappedImage = NULL;
 	iToSwap =false;
 	FitToGrid();
 	return;
-	//ImageMovedAlignToWorkspace(image);
 	ImageMovedAlignToOtherImages(image);
 	QPointF imageCurrentPos = image->GetPosition();
 	QPointF imageCurrentSize = image->GetSize();
@@ -567,9 +564,8 @@ void CGrowingGridLayout::ImageMoveFinished(CImage *image)
 		CImage *im=images.next();
 		if((im!=image) && (im->GetPosition()==image->GetPosition()))
 		{
-//TODO			im->SetManipulated(EManipNone);
+			im->SetManipulated(EManipNone);
 			swappedImage = im;
-			//gridToPos = FindGridPosition(im);
 			break;
 		}
 	}

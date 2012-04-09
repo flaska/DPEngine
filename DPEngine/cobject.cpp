@@ -84,11 +84,10 @@ void CObject::DrawInnerRect(QPainter* painter)
 	int bottom = iSize.y()-r.height()-r.top();
 	int right = r.left()+r.width();
 	int top = iSize.y()-r.top();
-	painter->setPen(QPen(QColor(255,0,0)));
-
+	//painter->setPen(QPen(QColor(0,0,0)));
 	QPointF position = GetPosition();
 	QPointF size = GetSize();
-	painter->drawRect(QRect(position.toPoint(),QSize(size.x(),size.y())));
+	painter->fillRect(QRect(position.toPoint(),QSize(size.x(),size.y())),Qt::black);
 }
 void CObject::SetInnerColor(TColor color)
 {
