@@ -318,11 +318,11 @@ void CImage::mousePressEvent(QMouseEvent *event)
 		iMouseState = EMouseStateImageMoving;
 		return;
 	}
-/*
+
 	if(event->button() == Qt::MidButton )
 	{
 		iMouseState = EMouseStateImageZooming;
-	}*/
+	}
 	if(event->button() == Qt::RightButton  )
 	{
 		iMouseState = EMouseStateImageWindowLeveling;
@@ -408,18 +408,16 @@ void CImage::mouseMoveEvent(QMouseEvent *event)
 		IsOnFrameSliderIcon (x,y);
 
 		return;
-	}
+	}*/
 	else if(iMouseState == EMouseStateImageZooming)
 	{
 		QCursor::setPos(iLockedGlobalMousePosition);
 		SetZoom(iZoomFactor*(1.-(float)dy/100.));
 		iImageCenter.setX((x-(x-iLockedImageCenter.x()*iSize.x())*(iZoomFactor/iLockedZoom))/iSize.x());
 		iImageCenter.setY((y-(y-iLockedImageCenter.y()*iSize.y())*(iZoomFactor/iLockedZoom))/iSize.y());
-		
 		return;
 	}
 	else 
-	*/
 	if(iMouseState == EMouseStateImageMoving)
 	{
 		iImageCenter.setX(iImageCenter.x()+(float)dx/iSize.x());
