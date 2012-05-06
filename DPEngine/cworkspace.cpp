@@ -12,8 +12,6 @@ CWorkspace::CWorkspace(CObject *parent, const QPointF &position, const QPointF &
 	iLastInnerHeight = 0;
 	iLastInnerWidth = 0;
 	iLayout = NULL;
-	iWorkspaceImage = new QImage(size.x(),size.y(),QImage::Format_RGB32);
-	iWorkspaceImage->fill(Qt::yellow);
 	SetSize(QPointF(size.x(),size.y()));
 	iLayout = new CGrowingGridLayout(this,EGrowinGridLayoutHorizontal);
 	SetBorders(Settings::GetBordersConstant(EWorkspaceBorders));
@@ -23,8 +21,6 @@ CWorkspace::CWorkspace(CObject *parent, const QPointF &position, const QPointF &
 }
 
 void CWorkspace::resizeEvent(QSize size){
-	if (iWorkspaceImage) delete iWorkspaceImage;
-	iWorkspaceImage = new QImage(size.width(),size.height(),QImage::Format_RGB32);
 	SetSize(QPointF(size.width(),size.height()));
 }
 
@@ -48,21 +44,24 @@ QList<CImage*>& CWorkspace::GetImages()
 }
 
 void CWorkspace::paint(QPainter* painter, QRect position){
-	iWorkspaceImage->fill(Qt::black);
+	QPixmap* outputpixmap = new QPixmap(iSize.x(),iSize.y());
+	outputpixmap->fill(Qt::black);
 	QListIterator<CImage*> images(iImages);
 	while (images.hasNext()){
 		CImage *cimage = images.next();
 		QPainter *qpainter = new QPainter();
-		qpainter->begin((QPaintDevice*)iWorkspaceImage);
+		qpainter->begin((QPaintDevice*)outputpixmap);
 		cimage->paint(qpainter);
 		if(iActiveImage==cimage)
 		{
 			cimage->DrawSelection(qpainter);
 		}
 		qpainter->end();
+		delete qpainter;
 	}
-	painter->drawImage(position,*iWorkspaceImage);
+	painter->drawPixmap(position,*outputpixmap);
 	DrawBorderRect(painter);
+	delete outputpixmap;
 }
 
 void CWorkspace::mousePressEvent(QMouseEvent *event){
@@ -135,9 +134,6 @@ void CWorkspace::RemoveImage(CImage *image)
 
 void CWorkspace::SetGeometry(float x, float y, float w, float h)
 {
-	if (iWorkspaceImage) delete iWorkspaceImage;
-	iWorkspaceImage = new QImage(w,h,QImage::Format_RGB32);
-	
 	QPointF oldPos = iPosition;
 	if(iLastInnerHeight ==0)
 	{

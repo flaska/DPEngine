@@ -92,6 +92,7 @@ void CImage::PrepareSlice(){
 			imageLine[x]=qRgb(newintensity,newintensity,newintensity);
 		}
 	}
+
 	if (iActualSliceCompleteImage)
 		delete iActualSliceCompleteImage;
 	iActualSliceCompleteImage = new QImage(img);

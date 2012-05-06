@@ -26,7 +26,6 @@ public:
 	QPointF GetDefaultWorkspaceSize();
 	QPointF GetDefaultWorkspacePosition();
 //private:
-	QPixmap* iPixmap;
 	static CWidget *instance;
 	CObject *iActiveObject;
 	CImageExplorer* iImageExplorer;

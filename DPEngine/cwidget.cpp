@@ -8,11 +8,8 @@
 CWidget *CWidget::instance = NULL;
 
 CWidget::CWidget(QWidget *parent){
-	iPixmap = NULL;
 	resize(500,500);
 	SetGeometry(0,0,500,500);
-	//iPixmap = new QPixmap(this->width(),this->height());
-	//setPixmap(*iPixmap);
 	QPointF workspaceExplorerPos(0,this->height()-Settings::imageExplorerSize);
 	QPointF workspaceExplorerSize(this->width(),Settings::imageExplorerSize);
 	iWorkspaceExplorer = CWorkspaceExplorer::InitInstance(this, workspaceExplorerPos,workspaceExplorerSize);
@@ -46,10 +43,6 @@ void CWidget::resizeEvent(QResizeEvent * event){/*
 
 void CWidget::SetGeometry(int x, int y, int w, int h)
 {
- 	if (iPixmap) delete iPixmap;
-	iPixmap = new QPixmap(w,h);
-	setPixmap(*iPixmap);
-
 	if(!CWorkspaceManager::GetInstance()) {
 		return;
 	}
@@ -133,21 +126,6 @@ void CWidget::mousePressEvent(QMouseEvent *event)
 }
 /*
 void CWidget::paint(){
-	QImage activeworkspaceimage = *(CWorkspaceManager::GetInstance()->GetActiveWorkspace()->iWorkspaceImage);
-	QImage *iWidgetImage = new QImage(this->width(),this->height(),QImage::Format_RGB32);
-	iWidgetImage->fill(0);
-	QPainter *qpainter=new QPainter();
-	qpainter->begin(iWidgetImage);
-	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->paint();
-	qpainter->drawImage(QRect(QPoint(0,0),QPoint(this->width()*4/5,this->height()*4/5)),activeworkspaceimage);
-	CImageExplorer::GetInstance()->paint(qpainter);
-	qpainter->end();
-	iPixmap->convertFromImage(*iWidgetImage);
-	setPixmap(*iPixmap);
-	repaint();
-}*/
-
-void CWidget::paint(){
 	QImage *iWidgetImage = new QImage(this->width(),this->height(),QImage::Format_RGB32);
 	iWidgetImage->fill(0);
 	QPainter *qpainter=new QPainter();
@@ -163,6 +141,23 @@ void CWidget::paint(){
 	repaint();
 	delete qpainter;
 	delete iWidgetImage;
+}
+*/
+void CWidget::paint(){
+	QPixmap *pixmap = new QPixmap(this->width(),this->height());
+	pixmap->fill(Qt::black);
+	QPainter *qpainter=new QPainter();
+	qpainter->begin(pixmap);
+	if (CWorkspaceManager::GetInstance()->GetActiveWorkspace()) {
+		CWorkspaceManager::GetInstance()->GetActiveWorkspace()->paint(qpainter,QRect(QPoint(0,0),QPoint(this->width()-Settings::imageExplorerSize,this->height()-Settings::imageExplorerSize)));
+	}
+	CImageExplorer::GetInstance()->paint(qpainter);
+	CWorkspaceExplorer::GetInstance()->paint(qpainter);
+	qpainter->end();
+	setPixmap(*pixmap);
+	repaint();
+	delete qpainter;
+	delete pixmap;
 }
 
 CWidget *CWidget::GetInstance(){
