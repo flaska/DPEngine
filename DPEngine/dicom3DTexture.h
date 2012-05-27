@@ -46,6 +46,7 @@ public:
 	int iDepth;
 	int iColorsCount;
 	int iBitsPerPixel;
+	DicomImage* iDicomImage;
 //	GLuint iTextureID;
 	TImageWindow iWindowDefaults;
 	QString iIdentificationString;

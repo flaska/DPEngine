@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 	CWidget::InitInstance(NULL);
 	CWidget::GetInstance()->paint();
 	CWidget::GetInstance()->show();
-	CImageExplorer::GetInstance()->OpenImage(QString("im1.dcm"));
+	CImageExplorer::GetInstance()->OpenImage(QString("s:/DP/DP/bin/MRIX/IM-0004-0001.dcm"));
 	CImageExplorer::GetInstance()->OpenImage(QString("im2.dcm"));
 	return a.exec();
 }

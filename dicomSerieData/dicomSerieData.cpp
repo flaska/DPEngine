@@ -1,16 +1,13 @@
 #include <stdio.h>
 #include <QtCore/QDir>
 
-#include <dicomSerieData.h>
+#include <dicom/dicomSerieData.h>
 #include <settings.h>
 
 #ifdef _DICOM_FRAMES_QT_PROGRESS
-//#include <mainWindow.h>
+#include <mainWindow.h>
 #include <QtGui/QProgressDialog>
-#include <QtGui/QMessageBox>
 #endif
-
-using namespace std;
 
 const float CDicomFrames::iWindowMultiplyFactor=1.5;
 CDicomFrames::CDicomFrames(char *fileName)
@@ -25,7 +22,7 @@ CDicomFrames::CDicomFrames(char *fileName)
 	iFramesFileNames = new QList<QString*>();
 	if(!LoadFromFile(fileName))
 	{
-////		throw DicomFramesException();
+		throw DicomFramesException();
 	}
 
 }
@@ -272,9 +269,9 @@ tryReadDicomImage://Label for goto
 	}
 	//prepare buffer for image data output ( 16 bits)
 	//TODO solve
-	const unsigned long size = iDicomImage->getOutputDataSize(8);;
+	const unsigned long size = iDicomImage->getOutputDataSize(16);;
 	//number of unsigned ints to allocate
-	iImagesInfo.frameQuintsCount = size / sizeof(quint8);
+	iImagesInfo.frameQuintsCount = size / sizeof(quint16);
 	if (isFirst)
 	{//perform allocation only once
 		iImagesInfo.frameSize = size;
@@ -282,7 +279,7 @@ tryReadDicomImage://Label for goto
 			delete iData;
 		//framesCount = 512;
 		//TODO handle huge numbger of frames // can not allocate
-		iData = new quint8[iImagesInfo.frameQuintsCount * framesCount];
+		iData = new quint16[iImagesInfo.frameQuintsCount * framesCount];
 	}
 	else
 	{//check image size for compatibility
@@ -322,23 +319,18 @@ tryReadDicomImage://Label for goto
 		}
 	}
 	iDicomImage->setWindow(iImagesInfo.window.center,iImagesInfo.window.width);
-	quint8 *target = iData+(iImagesInfo.frameQuintsCount*iImagesInfo.framesCount);
-	iDicomImage->getOutputData(target,size,8);
+	quint16 *target = iData+(iImagesInfo.frameQuintsCount*iImagesInfo.framesCount);
+	iDicomImage->getOutputData(target,size,16);
 	iImagesInfo.framesCount++;
 
 	//delete image object - data are stored separatedly
-	//FLASKA delete iDicomImage;
-	//FLASKA iDicomImage = NULL;
+	delete iDicomImage;
+	iDicomImage = NULL;
 	return true;
 }
 const void* CDicomFrames::GetImageData()
 {
 	return iData;
-}
-
-DicomImage* CDicomFrames::GetDicomImage()
-{
-	return iDicomImage;
 }
 
 bool CDicomFrames::LoadFrames(char *fileName)
@@ -380,8 +372,8 @@ bool CDicomFrames::LoadFrames(char *fileName)
 			QDir dir(strDirectoryPath );
 			QStringList files = dir.entryList();
 #ifdef _DICOM_FRAMES_QT_PROGRESS
-//////////////	tofix	    QProgressDialog progress("Loading sequence...", "Abort Loading", 1, files.count(), MainWindow::iSelfS);
-/////////////	tofix		progress.setWindowModality(Qt::WindowModal);
+		    QProgressDialog progress("Loading sequence...", "Abort Loading", 1, files.count(), MainWindow::iSelfS);
+			progress.setWindowModality(Qt::WindowModal);
 #endif
 			for (int i=1;i<files.count() ;i++)
 			{		
@@ -403,8 +395,8 @@ bool CDicomFrames::LoadFrames(char *fileName)
 			for (int i=1;i<framesCountToLoad ;i++)
 			{
 #ifdef _DICOM_FRAMES_QT_PROGRESS
-//////tofix				progress.setValue(i);
-/////tofix				if (progress.wasCanceled())
+				progress.setValue(i);
+				if (progress.wasCanceled())
 					break;
 #endif
 				if(!LoadDicomImage(iFramesFileNames->at(i)->toAscii().data()))
@@ -441,7 +433,7 @@ void CDicomFrames::PerformImageInputDataProcessing()
 			//iData[i] -= 32767;
 			//iData[i] *= 16;
 		}
-		quint8 a=iData[i];
+		quint16 a=iData[i];
 		if(a!=-32768)
 		{
 			a=a;

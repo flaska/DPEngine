@@ -67,6 +67,7 @@ public:
 	* It should be used immediately after the data are copied to external buffer
 	*/
 	void FreeData();
+	DicomImage* CDicomFrames::GetDicomImage();
 private:
 	CDicomHeader* iMainHeader;
 	bool iHeaderTransferred ;

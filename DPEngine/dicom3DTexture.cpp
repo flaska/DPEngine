@@ -79,7 +79,7 @@ CDicom3DTexture::CDicom3DTexture(QString &fileName)
 			//	d3dLog.write("glGetErr()(CDicom3DTexture::CDicom3DTexture glTexImage3D) not succesful");
 			//	throw TextureNotCreatedException();
 			//}
-		
+			iDicomImage = iFrames->GetDicomImage();
 			
 		}
 		break;
