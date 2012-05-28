@@ -327,8 +327,8 @@ tryReadDicomImage://Label for goto
 	iImagesInfo.framesCount++;
 
 	//delete image object - data are stored separatedly
-	//delete iDicomImage;
-	//iDicomImage = NULL;
+	delete iDicomImage;
+	iDicomImage = NULL;
 	return true;
 }
 const void* CDicomFrames::GetImageData()

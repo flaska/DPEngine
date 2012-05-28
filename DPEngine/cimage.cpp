@@ -27,6 +27,7 @@ CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &
 {	
 	iActualSliceCompleteImage = NULL;
 	iActualSliceCropImage = NULL;
+	iImageAxisOrientation=EImageOrientationAxial;
 	if(!C3DTextureManager::GetInstance())
 	{
 //TODO		throw TextureNotCreatedException(); 
@@ -50,6 +51,7 @@ CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &
 
 CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position, QPointF &size ):CObject(parentWindow,position,size)
 {	
+	iImageAxisOrientation = EImageOrientationAxial;
 	iActualSliceCompleteImage = NULL;
 	iActualSliceCropImage = NULL;
 	if(!texture)
@@ -69,20 +71,37 @@ CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position
 	}*/
 	iImageWindow.center=int((iImageWindow.center )/CDicomFrames::iWindowMultiplyFactor);
 	iImageWindow.width=int((iImageWindow.width )/CDicomFrames::iWindowMultiplyFactor);
+
+
+	iSize=size;
+	iFrameSlider.position.setX( 10);
+	iFrameSlider.size.setY(15);
+	iFrameSlider.size.setX(iSize.x() - iFrameSlider.position.x() - 25); //iSize.x() - size.x()
+	iFrameSlider.position.setY(iSize.y() - iFrameSlider.size.y()-2);
+	iFrameSlider.data=0;
+
+
 	PrepareSlice();
 }
 
 void CImage::PrepareSlice(){
-	int y = iActualTextureCoords.bottomLeft.GetZ();
+	int y = 20*iActualTextureCoords.bottomLeft.GetZ();
 	std::cout << y;
+	/*
 	DicomImage *iDicomImage=iTexture->GetDicomImage();
 	TDicomImagesInfo iImagesInfo;
 	int x = iTexture->iFrames->GetImagesInfo().framesCount;
 	std::cout << x;
 	quint8* iData = new quint8[iDicomImage->getOutputDataSize()];
 	iDicomImage->setWindow(iTexture->iFrames->GetImagesInfo().window.center,iTexture->iFrames->GetImagesInfo().window.width);
+	//iDicomImage->getOutputData(iData,iDicomImage->getOutputDataSize(8),8,y);
 	iDicomImage->getOutputData(iData,iDicomImage->getOutputDataSize(8),8,0);
 
+	std::cout << iDicomImage->getOutputDataSize(8) << std::endl;
+	for (int i=0; i<iDicomImage->getOutputDataSize(8); i++)
+		std::cout << iData[i] << std::endl;
+
+	
 	iImagesInfo.bps=iDicomImage->getDepth();
 	unsigned int sum = 0;
 	unsigned int sum2=0;
@@ -121,13 +140,13 @@ void CImage::PrepareSlice(){
 			sum2+=iData[i]*iData[i];
 		}
 	}
+	*/
+
+	quint8* dicomrawdata8bit = (quint8*)iTexture->iFrames->GetImageData();
+
+	dicomrawdata8bit = dicomrawdata8bit+(iTexture->iFrames->GetImagesInfo().frameQuintsCount*y) ;
 
 
-
-
-
-	//quint8* dicomrawdata8bit = (quint8*)iTexture->iFrames->GetImageData();
-	quint8* dicomrawdata8bit = (quint8*)iData;
 	uchar * dicomrawdata16bit = (uchar*)dicomrawdata8bit;
 
 	int dicomrawdatawidth = iTexture->iFrames->GetWidth();
@@ -529,8 +548,7 @@ void CImage::mouseMoveEvent(QMouseEvent *event)
 	CWidget::GetInstance()->paint();
 }
 
-void CImage::wheelEvent(QWheelEvent *event)
-{
+void CImage::wheelEvent(QWheelEvent *event){
 	if(event->delta() > 0 )
 	{
 		MoveToFrame(iFrameSlider.data+1);
@@ -538,6 +556,103 @@ void CImage::wheelEvent(QWheelEvent *event)
 	else if(event->delta() < 0 )
 	{
 		MoveToFrame(iFrameSlider.data-1);
+	}
+}
+
+void CImage::MoveToFrame(int frame){
+	float move = 0;
+	int depth = GetActualTextureDepth();
+	iFrameSlider.data=frame;
+	if(iFrameSlider.data <= 0)
+	{
+		iFrameSlider.data = 0;
+	}
+	if(iFrameSlider.data >= depth)
+	{
+		iFrameSlider.data = depth-1;
+	}
+	if((depth-1)!=0)
+	{
+	move=(float)iFrameSlider.data/(depth-1);
+	}
+	else
+	{
+		move = 0;
+	}
+	MoveToDepth(move);
+}
+
+void CImage::MoveToDepth(float inDepthPosition)
+{
+	switch(iImageAxisOrientation)
+	{
+	case EImageOrientationAxial:
+		{
+
+			iActualTextureCoords.bottomLeft.SetZ(inDepthPosition);
+			iActualTextureCoords.bottomRight.SetZ(inDepthPosition);
+			iActualTextureCoords.topLeft.SetZ(inDepthPosition);
+			iActualTextureCoords.topRight.SetZ(inDepthPosition);
+		}
+		break;
+	case EImageOrientationSagittal:
+		{
+
+			iActualTextureCoords.bottomLeft.SetX(inDepthPosition);
+			iActualTextureCoords.bottomRight.SetX(inDepthPosition);
+			iActualTextureCoords.topLeft.SetX(inDepthPosition);
+			iActualTextureCoords.topRight.SetX(inDepthPosition);
+		}
+		break;
+	case EImageOrientationCoronal: //zezadu dopredu
+		{
+
+			iActualTextureCoords.bottomLeft.SetY(inDepthPosition);
+			iActualTextureCoords.bottomRight.SetY(inDepthPosition);
+			iActualTextureCoords.topLeft.SetY(inDepthPosition);
+			iActualTextureCoords.topRight.SetY(inDepthPosition);
+		}
+		break;
+	default:
+		break;
+	}
+	iFrameSlider.data=(float)(inDepthPosition*(GetActualTextureDepth()));
+	if(iFrameSlider.data>= GetActualTextureDepth())
+	{
+		iFrameSlider.data = GetActualTextureDepth()-1;
+	}
+	PrepareSlice();
+	//if(iParentWorkspace)
+	//{
+	//	iParentWorkspace->UpdateTexture();
+	//}
+	CWidget::GetInstance()->paint();
+}
+
+float CImage::GetActualTextureDepth()
+{
+	//TODO compute it better ??
+	switch(iImageAxisOrientation)
+	{
+	case EImageOrientationAxial:
+		{
+			return iTexture->GetDepth();
+		}
+		break;
+	case EImageOrientationSagittal:
+		{
+			return iTexture->GetWidth();
+		}
+		break;
+	case EImageOrientationCoronal:
+		{
+			return iTexture->GetHeight();
+		}
+		break;
+	default:
+		{
+			return iTexture->GetDepth();
+		}
 	}
 }
 

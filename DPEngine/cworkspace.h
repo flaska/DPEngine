@@ -14,6 +14,7 @@ public:
 	CWorkspace();
 	CWorkspace(CObject *parent, const QPointF &position, const QPointF &size);
 	//void setImageFromFile(QString filename);
+	void wheelEvent(QWheelEvent *event);
 	void addImage(CImage* im);
 	QList<CImage*>& GetImages();
 	void paint(QPainter*, QRect);

@@ -27,6 +27,16 @@ CWidget::CWidget(QWidget *parent){
 
 }
 
+void CWidget::wheelEvent(QWheelEvent *event)
+{
+
+	//what object is mouse on
+	if(iActiveObject)
+	{
+		iActiveObject->wheelEvent(event);
+	}
+}
+
 void CWidget::resizeEvent(QResizeEvent * event){/*
 	if (iPixmap) delete iPixmap;
 	iPixmap = new QPixmap(event->size().width(),event->size().height());

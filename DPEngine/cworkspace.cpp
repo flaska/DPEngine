@@ -23,7 +23,15 @@ CWorkspace::CWorkspace(CObject *parent, const QPointF &position, const QPointF &
 void CWorkspace::resizeEvent(QSize size){
 	SetSize(QPointF(size.width(),size.height()));
 }
+void CWorkspace::wheelEvent(QWheelEvent *event){
+	if(iActiveImage)
+	{
+		//iLayout->PrepareImageToMove(iActiveImage);
+		iActiveImage->wheelEvent(event);
 
+		//iLayout->ImageMoved(iActiveImage);
+	}
+}
 void CWorkspace::addImage(CImage *image)
 {
 	image->SetParentWorkspace(this);

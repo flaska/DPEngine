@@ -89,6 +89,10 @@ CImageExplorer::CImageExplorer(CWidget *parentWindow, QPointF& position, QPointF
 	SetInnerColor(Settings::GetColorConstant(EImageExplorerInnerColor));
 }
 
+void CImageExplorer::wheelEvent(QWheelEvent *event)
+{
+
+}
 
 
 void CImageExplorer::OpenImage(QString &fileName)

@@ -18,6 +18,7 @@ class CImageExplorer: public QObject, public CObject
 private:
 	CImageExplorer(CWidget *parentWindow, QPointF &position, QPointF &size);
 public:
+	void wheelEvent(QWheelEvent *event);
 	virtual ~CImageExplorer();
 	static CImageExplorer* GetInstance();
 	static CImageExplorer* InitInstance(CWidget *parent, QPointF& position, QPointF &size );

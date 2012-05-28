@@ -44,7 +44,11 @@ public:
 	TImageWindow GetImageWindow();
 	void SetImageWindow(TImageWindow window);
 	void paint(QPainter*);
+	void wheelEvent(QWheelEvent *event);
+	float GetActualTextureDepth();
 private:
+	void MoveToFrame(int frame);
+	void MoveToDepth(float inDepthPosition);
 	QImage* iActualSliceCompleteImage;
 	QImage* iActualSliceCropImage;
 	CWorkspace* iParentWorkspace;
@@ -76,5 +80,6 @@ private:
 	CImage *iOwner;
 	void PrepareSlice();
 	void PrepareImageCrop();
+	TGLIcon iFrameSlider;
 };
 #endif
