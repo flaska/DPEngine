@@ -15,7 +15,7 @@ CWidget::CWidget(QWidget *parent){
 	iWorkspaceExplorer = CWorkspaceExplorer::InitInstance(this, workspaceExplorerPos,workspaceExplorerSize);
 	
 	CWorkspace *workspace = new CWorkspace(this,QPointF(0,0),QPointF(this->width()-Settings::imageExplorerSize,this->height()-Settings::imageExplorerSize));
-	CWorkspaceManager::InitInstance();
+	CWorkspaceManager::InitInstance(this);
 	//CWorkspaceManager::GetInstance()->SetActiveWorkspace(workspace);
 	CWorkspaceManager::GetInstance()->AddWorkspace(workspace);
 

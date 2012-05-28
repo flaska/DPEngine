@@ -20,7 +20,7 @@ private:
 public:
 	//static CWorkspaceManager* InitInstance(CGLObject *parent = NULL);
 	//static CWorkspaceManager* GetInstance(CGLObject *parent = NULL);
-	static CWorkspaceManager* InitInstance();
+	static CWorkspaceManager* InitInstance(CObject *parent = NULL);
 	static CWorkspaceManager* GetInstance();
 private:
 	static CWorkspaceManager *instance;	
@@ -38,6 +38,7 @@ public:
 private:
 	CWorkspace *iActiveWorkspace;
 	QList<CWorkspace*> iWorkspaces;
+	static CObject *iParent;
 	//static CGLObject *iParent;
 	//CGLPlanarWorkspace *iPlanarWorkspace;
 };

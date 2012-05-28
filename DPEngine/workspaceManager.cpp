@@ -4,7 +4,7 @@
 //#include <glWorkspaceSnapshot.h>
 CWorkspaceManager* CWorkspaceManager::instance = NULL;
 
-//CObject* CWorkspaceManager::iParent = NULL;
+CObject* CWorkspaceManager::iParent = NULL;
 CWorkspaceManager::CWorkspaceManager(/*CObject *parent*/)
 {
 	iActiveWorkspace = NULL;
@@ -120,18 +120,18 @@ CWorkspaceManager* CWorkspaceManager::GetInstance()
 	return instance;
 }
 
-CWorkspaceManager* CWorkspaceManager::InitInstance()
+CWorkspaceManager* CWorkspaceManager::InitInstance(CObject *parent)
 {
 	if(!instance)
 	{
-/*		if(parent)
+		if(parent)
 		{
 			iParent = parent;
 		}
 		else
 		{
 			return NULL;
-		}*/
+		}
 		instance = new CWorkspaceManager(/*parent*/);
 	}
 	return instance;

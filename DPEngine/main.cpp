@@ -9,15 +9,18 @@
 #include <cworkspace.h>
 #include <workspacemanager.h>
 #include <cimageexplorer.h>
+#include <mainwindow.h>
 
 
 
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-	CWidget::InitInstance(NULL);
-	CWidget::GetInstance()->paint();
-	CWidget::GetInstance()->show();
-	CImageExplorer::GetInstance()->OpenImage(QString("s:/DP/DP/bin/Knee/IM-0001-0001.dcm"));
+    MainWindow w;
+    w.show();
+	//CWidget::InitInstance(NULL);
+	//CWidget::GetInstance()->paint();
+	//CWidget::GetInstance()->show();
+	//CImageExplorer::GetInstance()->OpenImage(QString("s:/DP/DP/bin/Knee/IM-0001-0001.dcm"));
 	return a.exec();
 }

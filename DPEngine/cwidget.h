@@ -1,3 +1,6 @@
+#ifndef _CWIDGET_H
+#define _CWIDGET_H
+
 #include <QtGui/QtGui>
 #include <cobject.h>
 #include <cworkspaceexplorer.h>
@@ -39,3 +42,5 @@ private:
 	void LoadIcons();
 	CWorkspaceExplorer *iWorkspaceExplorer;
 };
+
+#endif
