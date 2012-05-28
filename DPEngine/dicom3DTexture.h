@@ -32,6 +32,7 @@ public:
 	void SetIdentificationString(QString &str);
 	QString &GetIdentificationString();
 	QString &GetFileName();
+	DicomImage* GetDicomImage();
 	
 
 //TODO private:

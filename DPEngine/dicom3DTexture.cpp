@@ -116,6 +116,11 @@ CDicom3DTexture::CDicom3DTexture(QString &fileName)
 	
 }
 
+DicomImage* CDicom3DTexture::GetDicomImage()
+{
+	return iDicomImage;
+}
+
 void CDicom3DTexture::SetIdentificationString(QString &str)
 {
 	iIdentificationString = str;

@@ -73,8 +73,63 @@ CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position
 }
 
 void CImage::PrepareSlice(){
-	quint8* dicomrawdata8bit = (quint8*)iTexture->iFrames->GetImageData();
+	int y = iActualTextureCoords.bottomLeft.GetZ();
+	std::cout << y;
+	DicomImage *iDicomImage=iTexture->GetDicomImage();
+	TDicomImagesInfo iImagesInfo;
+	int x = iTexture->iFrames->GetImagesInfo().framesCount;
+	std::cout << x;
+	quint8* iData = new quint8[iDicomImage->getOutputDataSize()];
+	iDicomImage->setWindow(iTexture->iFrames->GetImagesInfo().window.center,iTexture->iFrames->GetImagesInfo().window.width);
+	iDicomImage->getOutputData(iData,iDicomImage->getOutputDataSize(8),8,0);
+
+	iImagesInfo.bps=iDicomImage->getDepth();
+	unsigned int sum = 0;
+	unsigned int sum2=0;
+	int poc=0;
+	int maxx=0;
+	int minn=+32767;
+	int vals[65536];
+	for(int i=0;i<65536;i++)
+	{
+		vals[i]=0;
+	}
+	for (int i=0;i<iTexture->iFrames->GetImagesInfo().height*iTexture->iFrames->GetImagesInfo().width;i++)
+	{
+		if(iTexture->iFrames->GetImagesInfo().bps==17)
+		{//specialized actions for brain
+			//iData[i] -= 32767;
+			//iData[i] *= 16;
+		}
+		quint8 a=iData[i];
+		if(a!=-32768)
+		{
+			a=a;
+		}
+
+		if (a>maxx)
+			maxx=a;
+		if(a<minn)
+			minn=a;
+		a=abs(a);
+		if(a<65537)
+		{
+			vals[a]++;
+			a=a-2147483648;
+			poc++;
+			sum+=iData[i];
+			sum2+=iData[i]*iData[i];
+		}
+	}
+
+
+
+
+
+	//quint8* dicomrawdata8bit = (quint8*)iTexture->iFrames->GetImageData();
+	quint8* dicomrawdata8bit = (quint8*)iData;
 	uchar * dicomrawdata16bit = (uchar*)dicomrawdata8bit;
+
 	int dicomrawdatawidth = iTexture->iFrames->GetWidth();
 	int dicomrawdataheight = iTexture->iFrames->GetHeight();
 	int dicomrawdatabytesperline = iTexture->iFrames->GetWidth();
@@ -472,6 +527,18 @@ void CImage::mouseMoveEvent(QMouseEvent *event)
 	*/
 	iPreviousMousePosition = QPoint(x, y);	
 	CWidget::GetInstance()->paint();
+}
+
+void CImage::wheelEvent(QWheelEvent *event)
+{
+	if(event->delta() > 0 )
+	{
+		MoveToFrame(iFrameSlider.data+1);
+	}
+	else if(event->delta() < 0 )
+	{
+		MoveToFrame(iFrameSlider.data-1);
+	}
 }
 
 CImage* CImage::CreateDerivedImage(/*TImageAxisOrientation orientation*/)

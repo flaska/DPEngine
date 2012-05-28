@@ -327,13 +327,18 @@ tryReadDicomImage://Label for goto
 	iImagesInfo.framesCount++;
 
 	//delete image object - data are stored separatedly
-	//FLASKA delete iDicomImage;
-	//FLASKA iDicomImage = NULL;
+	//delete iDicomImage;
+	//iDicomImage = NULL;
 	return true;
 }
 const void* CDicomFrames::GetImageData()
 {
 	return iData;
+}
+
+TDicomImagesInfo CDicomFrames::GetImagesInfo()
+{
+	return iImagesInfo;
 }
 
 DicomImage* CDicomFrames::GetDicomImage()
@@ -402,11 +407,11 @@ bool CDicomFrames::LoadFrames(char *fileName)
 				framesCountToLoad=Settings::GetIntegerConstant(EMaximumFramesToLoad);
 			for (int i=1;i<framesCountToLoad ;i++)
 			{
-#ifdef _DICOM_FRAMES_QT_PROGRESS
+//#ifdef _DICOM_FRAMES_QT_PROGRESS
 //////tofix				progress.setValue(i);
 /////tofix				if (progress.wasCanceled())
-					break;
-#endif
+//					break;   //flaska
+//#endif
 				if(!LoadDicomImage(iFramesFileNames->at(i)->toAscii().data()))
 				{
 					cerr << iFramesFileNames->at(i)->toAscii().data() << " skipped"; 
