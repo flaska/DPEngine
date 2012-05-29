@@ -1,11 +1,10 @@
 #ifndef MWORKSPACELAYOUT_H_asdasd456
 #define MWORKSPACELAYOUT_H_asdasd456
-
 #include <QtCore/QString>
 #include <QtCore/QPoint>
 #include <QtGui/QScrollBar>
-#include <cimage.h>
-#include <cworkspace.h>
+//#include <cimage.h>
+//#include <cworkspace.h>
 #include <dicomSerieData.h>
 #include <dicom3DTexture.h>
 //#include <glObjects/glImage.h>
@@ -23,6 +22,7 @@ ELayoutGrowingGridHorizontal = 1,
 ELayoutFree =2
 }
 TLayoutType;
+
 
 class MWorkspaceLayout
 {

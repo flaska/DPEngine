@@ -5,6 +5,7 @@
 #include <cobject.h>
 #include <workspacelayout.h>
 #include <cworkspacesnapshot.h>
+//#include <workspacelayout.h>
 
 class CImage;
 class MWorkspaceLayout;
@@ -12,7 +13,7 @@ class CWorkspaceSnapshot;
 class CWorkspace : public CObject {
 public:
 	CWorkspace();
-	CWorkspace(CObject *parent, const QPointF &position, const QPointF &size);
+	CWorkspace(CObject*, const QPointF&, const QPointF&);
 	//void setImageFromFile(QString filename);
 	void wheelEvent(QWheelEvent *event);
 	void addImage(CImage* im);
@@ -29,6 +30,7 @@ public:
 	CImage* GetActiveImage();
 	QString& GetName();
 	void SetName(const QString &name);
+	void SetLayout(TLayoutType type);
 //private:
 	QString* iName;
 	MWorkspaceLayout *iLayout;

@@ -193,7 +193,7 @@ void CInfoPanel::WorkspaceLayoutSelected( const QString& str)
 	int index = iComboLayout->currentIndex();
 	if(iSourceWorkspace)
 	{
-//		iSourceWorkspace->SetLayout((TLayoutType)index);
+		iSourceWorkspace->SetLayout((TLayoutType)index);
 		if(	CWidget::GetInstance())
 		{
 			CWidget::GetInstance()->paint();

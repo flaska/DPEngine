@@ -1,6 +1,6 @@
 #include <workspaceLayout.h>
 #include <cimage.h>
-#include <cworkspace.h>
+//#include <cworkspace.h>
 //#include <cobject.h>
 #include <cimage.h>
 

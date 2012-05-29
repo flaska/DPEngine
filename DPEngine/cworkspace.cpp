@@ -18,7 +18,8 @@ CWorkspace::CWorkspace(CObject *parent, const QPointF &position, const QPointF &
 	iActiveImage = NULL;
 	iName = new QString();
 	SetSize(QPointF(size.x(),size.y()));
-	iLayout = new CGrowingGridLayout(this,EGrowinGridLayoutHorizontal);
+	//iLayout = new CGrowingGridLayout(this,EGrowinGridLayoutHorizontal);
+	SetLayout(ELayoutGrowingGridHorizontal);
 	SetBorders(Settings::GetBordersConstant(EWorkspaceBorders));
 	SetBorderColor(Settings::GetColorConstant(EWorkspaceBorderColor));
 	SetInnerColor(Settings::GetColorConstant(EWorkspaceInnerColor));
@@ -28,6 +29,43 @@ CWorkspace::CWorkspace(CObject *parent, const QPointF &position, const QPointF &
 	name.append("WS:");
 	name.append(QString::number(CWorkspaceManager::GetInstance()->GetWorkspaces().count()));
 	SetName(name);
+}
+
+
+void CWorkspace::SetLayout(TLayoutType type){
+	if(iLayout)
+	{
+		if(iLayout->GetType() == type)
+		{
+			return;
+		}
+	}
+	if(iLayout)
+	{
+		delete iLayout;
+		iLayout = NULL;
+	}
+	switch (type)
+	{
+	case ELayoutFree:
+		{
+			iLayout= new CFreeLayout(this);
+			iLayout->Do();
+			break;
+		};
+	case ELayoutGrowingGridHorizontal:
+		{
+			iLayout= new CGrowingGridLayout(this,EGrowinGridLayoutHorizontal);
+			iLayout->Do();
+			break;
+		};
+	case ELayoutGrowingGridVertical:
+		{
+			iLayout= new CGrowingGridLayout(this,EGrowinGridLayoutVertical);
+			iLayout->Do();
+			break;
+		};
+	}
 }
 
 void CWorkspace::SetName(const QString &name)
