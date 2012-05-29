@@ -4,11 +4,9 @@
 #include <dicomSerieData.h>
 #include <settings.h>
 
-#ifdef _DICOM_FRAMES_QT_PROGRESS
-//#include <mainWindow.h>
+#include <mainWindow.h>
 #include <QtGui/QProgressDialog>
 #include <QtGui/QMessageBox>
-#endif
 
 using namespace std;
 
@@ -384,10 +382,8 @@ bool CDicomFrames::LoadFrames(char *fileName)
 		{
 			QDir dir(strDirectoryPath );
 			QStringList files = dir.entryList();
-#ifdef _DICOM_FRAMES_QT_PROGRESS
-//////////////	tofix	    QProgressDialog progress("Loading sequence...", "Abort Loading", 1, files.count(), MainWindow::iSelfS);
-/////////////	tofix		progress.setWindowModality(Qt::WindowModal);
-#endif
+			QProgressDialog progress("Loading sequence...", "Abort Loading", 1, files.count(), MainWindow::iSelfS);
+			progress.setWindowModality(Qt::WindowModal);
 			for (int i=1;i<files.count() ;i++)
 			{		
 				QString *file=new QString(files.at(i));
@@ -407,11 +403,9 @@ bool CDicomFrames::LoadFrames(char *fileName)
 				framesCountToLoad=Settings::GetIntegerConstant(EMaximumFramesToLoad);
 			for (int i=1;i<framesCountToLoad ;i++)
 			{
-//#ifdef _DICOM_FRAMES_QT_PROGRESS
-//////tofix				progress.setValue(i);
-/////tofix				if (progress.wasCanceled())
-//					break;   //flaska
-//#endif
+				progress.setValue(i);
+				if (progress.wasCanceled())
+					break;
 				if(!LoadDicomImage(iFramesFileNames->at(i)->toAscii().data()))
 				{
 					cerr << iFramesFileNames->at(i)->toAscii().data() << " skipped"; 

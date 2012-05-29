@@ -352,6 +352,9 @@ void CImageExplorer::paint(QPainter *painter)
 		}
 	}
 	DrawBorderRect(painter);
+	if(iActiveImage){
+		iActiveImage->DrawSelection(painter);
+	}
 }
 
 void CImageExplorer::CloseImage(CImage *image)

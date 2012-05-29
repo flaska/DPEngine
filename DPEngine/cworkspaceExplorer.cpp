@@ -350,6 +350,7 @@ void CWorkspaceExplorer::AddNewWorkspace()
 	CWorkspace *newWorkspace = new CWorkspace(cwidget,cwidget->GetDefaultWorkspacePosition(),cwidget->GetDefaultWorkspaceSize());
 	CWorkspaceManager::GetInstance()->AddWorkspace(newWorkspace);
 	SelectWorkspace(newWorkspace);
+	cwidget->paint();	
 }/*
 void CGLWorkspaceExplorer::CreateNewPlanarWorkspace()
 {

@@ -113,16 +113,13 @@ void CObject::DrawIcons(QPainter* painter){
 	{
 		painter->setPen(QPen(QColor(255,0,0)));
 		QPoint position(iMoveIcon.position.x()+GetPosition().x(),iMoveIcon.position.y()+GetPosition().y());
-		painter->drawRect(QRect(position,QSize(iMoveIcon.size.x(),iMoveIcon.size.y())));
 		painter->drawImage(QRect(position,QSize(iMoveIcon.size.x(),iMoveIcon.size.y())),*CWidget::GetInstance()->getIcon(TIconType::MoveIcon));
-
 	}
 	//Resize icon
 	if(iResizeAbility )
 	{
 		painter->setPen(QPen(QColor(255,0,0)));
 		QPoint position(iResizeIcon.position.x()+GetPosition().x(),iResizeIcon.position.y()+GetPosition().y());
-		painter->drawRect(QRect(position,QSize(iResizeIcon.size.x(),iResizeIcon.size.y())));
 		painter->drawImage(QRect(position,QSize(iMoveIcon.size.x(),iMoveIcon.size.y())),*CWidget::GetInstance()->getIcon(TIconType::ResizeIcon));
 		
 	}
@@ -131,7 +128,6 @@ void CObject::DrawIcons(QPainter* painter){
 	{
 		painter->setPen(QPen(QColor(255,0,0)));
 		QPoint position(iCloseIcon.position.x()+GetPosition().x(),iCloseIcon.position.y()+GetPosition().y());
-		painter->drawRect(QRect(position,QSize(iCloseIcon.size.x(),iCloseIcon.size.y())));
 		painter->drawImage(QRect(position,QSize(iMoveIcon.size.x(),iMoveIcon.size.y())),*CWidget::GetInstance()->getIcon(TIconType::CloseIcon));
 	}
 }
