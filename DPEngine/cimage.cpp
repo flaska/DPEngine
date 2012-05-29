@@ -214,6 +214,7 @@ void CImage::Init(CObject *parentWindow, QPointF& position, QPointF &size )
 	QString name;
 	name.clear();
 	name.append("image");
+	//name.append(QString::number(CWorkspaceManager::GetInstance()->GetWorkspaces().count()));
 	SetName(name);
 	iManipulated = EManipNone;
 	iOwner = NULL;
@@ -670,8 +671,8 @@ CImage* CImage::CreateDerivedImage(TImageAxisOrientation orientation)
 	CWidget::GetInstance()->paint();
 	newImage->SetOwner(this);
 	QString name("Im:");
-	//TODOname.append(QString::number(iDerivedImages.count()));
-	//newImage->SetName(name);
+	name.append(QString::number(iDerivedImages.count()));
+	newImage->SetName(name);
 	iDerivedImages.append(newImage);
 	//newImage->SetOrientation(orientation);
 	return newImage;

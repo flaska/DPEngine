@@ -9,11 +9,13 @@
 #include <cimageexplorer.h>
 #include <cwidget.h>
 #include <infopanel.h>
+#include <workspacemanager.h>
 
 CWorkspace::CWorkspace(CObject *parent, const QPointF &position, const QPointF &size):CObject(parent, position, size){
 	iLastInnerHeight = 0;
 	iLastInnerWidth = 0;
 	iLayout = NULL;
+	iActiveImage = NULL;
 	iName = new QString();
 	SetSize(QPointF(size.x(),size.y()));
 	iLayout = new CGrowingGridLayout(this,EGrowinGridLayoutHorizontal);
@@ -21,6 +23,17 @@ CWorkspace::CWorkspace(CObject *parent, const QPointF &position, const QPointF &
 	SetBorderColor(Settings::GetColorConstant(EWorkspaceBorderColor));
 	SetInnerColor(Settings::GetColorConstant(EWorkspaceInnerColor));
 	iWorkspaceSnapshot = new CWorkspaceSnapshot(parent,this,QPointF(10,10/*+CWorkspaceExplorer::GetInstance()->GetPosition().y()*/), QPointF(100,100));
+	QString name;
+	name.clear();
+	name.append("WS:");
+	name.append(QString::number(CWorkspaceManager::GetInstance()->GetWorkspaces().count()));
+	SetName(name);
+}
+
+void CWorkspace::SetName(const QString &name)
+{
+	iName->clear();
+	iName->append(name);
 }
 
 CImage* CWorkspace::GetActiveImage()

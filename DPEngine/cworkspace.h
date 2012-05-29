@@ -28,6 +28,7 @@ public:
 	CWorkspaceSnapshot& GetSnapshot();
 	CImage* GetActiveImage();
 	QString& GetName();
+	void SetName(const QString &name);
 //private:
 	QString* iName;
 	MWorkspaceLayout *iLayout;
