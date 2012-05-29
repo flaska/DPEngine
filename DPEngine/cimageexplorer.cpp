@@ -1,7 +1,7 @@
 #include <cimageexplorer.h>
 #include <cwidget.h>
 #include <cimage.h>
-//TODO #include <infoPanel.h>
+#include <infoPanel.h>
 #include <workspaceManager.h>
 //TODO #include <mainWindow.h>
 #include <settings.h>
@@ -49,6 +49,11 @@ void CImageExplorer::Scrolled(int value)
 	}
 }
 */
+
+CImage* CImageExplorer::GetSelectedImage()
+{
+	return iActiveImage;
+}
 CImageExplorer* CImageExplorer::InitInstance(CWidget *parent, QPointF& position, QPointF &size )
 {
 	if(!instance)
@@ -58,11 +63,6 @@ CImageExplorer* CImageExplorer::InitInstance(CWidget *parent, QPointF& position,
 	return instance;
 }
 
-
-CImage* CImageExplorer::GetSelectedImage()
-{
-	return iActiveImage;
-}
 
 CImageExplorer* CImageExplorer::GetInstance()
 {
@@ -143,11 +143,10 @@ void CImageExplorer::OpenImage(QString &fileName)
 	{
 		CWidget::GetInstance()->paint();
 	}
-/*TODO	if(CInfoPanel::GetInstance())
+	if(CInfoPanel::GetInstance())
 	{
 		CInfoPanel::GetInstance()->SetImageExplorerInfoView();
 	}
-*/
 	//CImage *im = new CImage(iParentWindow,fileName,pos,size);
 }
 
@@ -311,6 +310,8 @@ void CImageExplorer::mouseMoveEvent(QMouseEvent *event)
 
 }
 
+
+
 void CImageExplorer::mousePressEvent(QMouseEvent *event)
 {
 	iActiveImage = NULL;
@@ -321,21 +322,18 @@ void CImageExplorer::mousePressEvent(QMouseEvent *event)
 		CImage* obj = images.previous();
 		if(obj->IsPointOnObject(event->x(),event->y()))
 		{
+			//iActiveImage = obj;
+			//iImages.move(iImages.indexOf(obj),iImages.count()-1);
 			obj->mousePressEvent(event);
 			SelectImage(obj);
-				/* DEMO */
-			if (iActiveImage){ CImage *image = iActiveImage->CreateDerivedImage(/*EImageOrientationAxial*/);
-			CWorkspaceManager::GetInstance()->GetActiveWorkspace()->addImage(image);}
-	/* DEMO */
+			CWidget::GetInstance()->paint();
 			break;
 		}
 	}
-/*TODO	if(CInfoPanel::GetInstance())
+	if(CInfoPanel::GetInstance())
 	{
-
 		CInfoPanel::GetInstance()->SetImageExplorerInfoView();
 	}
-*/
 }
 
 void CImageExplorer::paint(QPainter *painter)
@@ -389,4 +387,12 @@ void CImageExplorer::CloseImage(CImage *image)
 	{
 		CInfoPanel::GetInstance()->SetImageExplorerInfoView();
 	}*/
+}
+
+void CImageExplorer::mouseReleaseEvent(QMouseEvent *event)
+{
+	if(iActiveImage)
+	{
+		iActiveImage->mouseReleaseEvent(event);
+	}
 }

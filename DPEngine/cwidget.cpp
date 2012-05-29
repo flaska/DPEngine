@@ -262,3 +262,11 @@ void CWidget::mouseDoubleClickEvent(QMouseEvent *event)
 		}
 	}
 }
+
+void CWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+	if(iActiveObject)
+	{
+		iActiveObject->mouseReleaseEvent(event);
+	}
+}

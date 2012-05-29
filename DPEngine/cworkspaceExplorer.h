@@ -19,7 +19,7 @@ private:
 	CWorkspaceExplorer(CWidget *parentWindow, QPointF &position, QPointF &size);
 public:
 	void AddNewWorkspace();
-	void CreateNewPlanarWorkspace();
+	//void CreateNewPlanarWorkspace();
 	virtual ~CWorkspaceExplorer();
 	static CWorkspaceExplorer* GetInstance();
 	static CWorkspaceExplorer* InitInstance(CWidget *parent, QPointF& position, QPointF &size );

@@ -2,8 +2,8 @@
 #include <QtCore/QSettings>
 #include <QtCore/QRect>
 #include <QtCore/QRectF>
-int Settings::imageWindowingCenterSensitivity = 40;
-int Settings::imageWindowingWidthSensitivity = 4;
+int Settings::imageWindowingCenterSensitivity = 1;
+int Settings::imageWindowingWidthSensitivity = 1;
 int Settings::iconSize = 25;
 bool Settings::iDeleted = false;
 bool Settings::iSettingsRead = false;

@@ -19,6 +19,7 @@ private:
 	CImageExplorer(CWidget *parentWindow, QPointF &position, QPointF &size);
 public:
 	void wheelEvent(QWheelEvent *event);
+	CImage* GetSelectedImage();
 	virtual ~CImageExplorer();
 	static CImageExplorer* GetInstance();
 	static CImageExplorer* InitInstance(CWidget *parent, QPointF& position, QPointF &size );
@@ -28,7 +29,6 @@ public:
 //	void initializeGL();
 	void DrawIcons();
 	void DrawTexts();
-	CImage* GetSelectedImage();
 	void SetGeometry(int x, int y, int width, int height);
 //TODO	void paintGL();
 /*	void SetGeometry(int x, int y, int width, int height);
@@ -40,6 +40,7 @@ public:
 */
 	void mousePressEvent(QMouseEvent *event);	
 	void mouseMoveEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
 /*
 	public slots:
 	void Scrolled(int value);ja 

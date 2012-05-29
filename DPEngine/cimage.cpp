@@ -5,6 +5,7 @@
 #include <settings.h>
 #include <cimageexplorer.h>
 #include <workspacemanager.h>
+#include <infopanel.h>
 
 
 void CImage::setImageFromFile(QString filename){
@@ -155,14 +156,14 @@ void CImage::PrepareSlice(){
 	QImage img = QImage(dicomrawdata16bit, dicomrawdatawidth, dicomrawdataheight, dicomrawdatabytesperline, QImage::Format_Indexed8);
 	img = img.convertToFormat(QImage::Format_RGB32);
 	if (img.isNull()) return;
-	int bias = (int)iBias*10.0;
+	float bias = iBias*255.0;
 	for (int y=0; y<dicomrawdataheight; y++){
 		QRgb* imageLine=(QRgb*)img.scanLine(y);
 		for (int x=0; x<dicomrawdatawidth; x++) {
 			float originalintensity = (float)qRed(imageLine[x]);
-			int newintensity = (int)(originalintensity*iScale+iBias);
-			if(newintensity>255) newintensity=255;
-			if(newintensity<0) newintensity=0;
+			int newintensity = (int)(originalintensity*iScale+bias);
+			if(newintensity>254) newintensity=254;
+			if(newintensity<1) newintensity=1;
 			imageLine[x]=qRgb(newintensity,newintensity,newintensity);
 		}
 	}
@@ -413,18 +414,20 @@ void CImage::mouseReleaseEvent(QMouseEvent *event)
 	}
 	iManipulated=EManipNone;
 	CWidget::GetInstance()->paint();
-	/*if(CInfoPanel::GetInstance())
+	if(CInfoPanel::GetInstance())
 	{
 		if(CInfoPanel::GetInstance()->GetSourceImage() == this)
 		{
 			CInfoPanel::GetInstance()->SetSourceImage(this);
 		}
-	}*/
+	}
 }
 
 void CImage::SetImageWindow(TImageWindow window)
 {
 	iImageWindow = window;
+	std::cout << "imagewindow width " << iImageWindow.width << std::endl;
+	std::cout << "imagewindow center " << iImageWindow.center << std::endl;
 
 	float cd= iTexture->GetWindowDefaults().center;
 	float wd =iTexture->GetWindowDefaults().width;
@@ -436,8 +439,13 @@ void CImage::SetImageWindow(TImageWindow window)
 	w = iImageWindow.width/wd ;
 	float scale = 1./w;
 	bias =- (c-w/2)*scale;
-	if (scale>0.0 && scale<100.0) iScale = scale;
-	if (bias>0.0 && bias<100.0) iBias = bias;
+	//if (scale>0.0 && scale<100.0) iScale = scale;
+	//if (bias>0.0 && bias<100.0) iBias = bias;
+	iScale = scale;
+	iBias = bias;
+
+	std::cout << "SetImageWindow Bias " << iBias << std::endl;
+	std::cout << "SetImageWindow Scale " << iScale << std::endl;
 
 	PrepareSlice();
 	if(iParentWorkspace)
@@ -656,7 +664,7 @@ float CImage::GetActualTextureDepth()
 	}
 }
 
-CImage* CImage::CreateDerivedImage(/*TImageAxisOrientation orientation*/)
+CImage* CImage::CreateDerivedImage(TImageAxisOrientation orientation)
 {
 /*TODO	if(!CWorkspaceManager::GetInstance()->GetActiveWorkspace())
 	{
@@ -672,7 +680,7 @@ CImage* CImage::CreateDerivedImage(/*TImageAxisOrientation orientation*/)
 //	try
 //	{
 		newImage = new CImage(CWorkspaceManager::GetInstance()->GetActiveWorkspace(),
-			C3DTextureManager::GetInstance()->GetTexture(this->GetTexture()->GetIdentificationString()),pos,size);
+		C3DTextureManager::GetInstance()->GetTexture(this->GetTexture()->GetIdentificationString()),pos,size);
 //	}
 /*TODO	catch(DicomFramesException &e)
 	{

@@ -98,7 +98,7 @@ void CWorkspaceExplorer::SelectWorkspace(CWorkspace *workspace)
 //TODO		workspace->StartAnimations();	
 	}
 	//TODO	if(CInfoPanel::GetInstance())
-	//TODO	CInfoPanel::GetInstance()->SetWorkspaceExplorerInfoView();
+	CInfoPanel::GetInstance()->SetWorkspaceExplorerInfoView();
 }
 
 void CWorkspaceExplorer::SelectPlanarWorkspace()
@@ -449,7 +449,7 @@ void CWorkspaceExplorer::mousePressEvent(QMouseEvent *event)
 		return;
 //	if(!CInfoPanel::GetInstance())
 //		return;
-//	CInfoPanel::GetInstance()->SetWorkspaceExplorerInfoView();
+	CInfoPanel::GetInstance()->SetWorkspaceExplorerInfoView();
 	QListIterator<CWorkspace*> workspaces(CWorkspaceManager::GetInstance()->GetWorkspaces());
 	workspaces.toBack ();
 	while (workspaces.hasPrevious())

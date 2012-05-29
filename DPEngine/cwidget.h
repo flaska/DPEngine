@@ -20,6 +20,7 @@ public:
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseDoubleClickEvent(QMouseEvent *event);
 	void wheelEvent(QWheelEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
 	void paint();
 	static CWidget *GetInstance();
 	static CWidget* InitInstance(QWidget *parent);

@@ -8,6 +8,8 @@
 #include <cobject.h>
 #include <cimageexplorer.h>
 #include <cwidget.h>
+#include <infopanel.h>
+
 CWorkspace::CWorkspace(CObject *parent, const QPointF &position, const QPointF &size):CObject(parent, position, size){
 	iLastInnerHeight = 0;
 	iLastInnerWidth = 0;
@@ -19,6 +21,12 @@ CWorkspace::CWorkspace(CObject *parent, const QPointF &position, const QPointF &
 	SetInnerColor(Settings::GetColorConstant(EWorkspaceInnerColor));
 	iWorkspaceSnapshot = new CWorkspaceSnapshot(parent,this,QPointF(10,10/*+CWorkspaceExplorer::GetInstance()->GetPosition().y()*/), QPointF(100,100));
 }
+
+CImage* CWorkspace::GetActiveImage()
+{
+	return iActiveImage;
+}
+
 
 void CWorkspace::resizeEvent(QSize size){
 	SetSize(QPointF(size.width(),size.height()));
@@ -38,10 +46,10 @@ void CWorkspace::addImage(CImage *image)
 	iImages.append(image);
 	iLayout->PrepareNewImageGeometry(image);
 	//UpdateTexture();
-	//if(CGLWidget::GetInstance())
-	//{
-	//	CGLWidget::GetInstance()->updateGL();
-	//}
+	if(CWidget::GetInstance())
+	{
+		CWidget::GetInstance()->paint();
+	}
 
 	/// temporary
 }
@@ -90,7 +98,16 @@ void CWorkspace::mousePressEvent(QMouseEvent *event){
 			break;
 		}
 	}
-//TODO	CInfoPanel::GetInstance()->SetWorkspaceInfoView();
+	CInfoPanel::GetInstance()->SetWorkspaceInfoView();
+}
+
+void CWorkspace::mouseReleaseEvent(QMouseEvent *event)
+{
+	if(iActiveImage)
+	{
+		iActiveImage->mouseReleaseEvent(event);
+		//UpdateTexture();
+	}
 }
 
 MWorkspaceLayout &CWorkspace::GetLayout()

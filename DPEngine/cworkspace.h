@@ -20,11 +20,13 @@ public:
 	void paint(QPainter*, QRect);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
 	MWorkspaceLayout &GetLayout();
 	void SelectImage(CImage *image);
 	void RemoveImage(CImage *image);
 	void SetGeometry(float x, float y, float w, float h);
 	CWorkspaceSnapshot& GetSnapshot();
+	CImage* GetActiveImage();
 //private:
 	MWorkspaceLayout *iLayout;
 	QImage* iWorkspaceImage;
