@@ -120,15 +120,13 @@ void CInfoPanel::ImageWindowCenterChanged(int value)
 //		iSourceImage->SetTextDisplay(EDisplayTextFrameData, value);
 		}
 	}
-	void CInfoPanel::ImageFrameDataChanged(int value)
-	{
-			if(iSourceImage)
-	{
-//		iSourceImage->MoveToFrame(value);
+void CInfoPanel::ImageFrameDataChanged(int value){
+	if(iSourceImage){
+		iSourceImage->MoveToFrame(value);
 	}
-		}
+}
 
-	void CInfoPanel::GlobalAnimationPauseChecked(int value)
+void CInfoPanel::GlobalAnimationPauseChecked(int value)
 	{
 //	if(CAnimationManager::GetInstance())
 	{
@@ -463,6 +461,7 @@ zoomFrameLayout->setSpacing(Settings::GetIntegerConstant(EInfoPanelSpacing));
 	iImageZoomField->setMaximum(10000.0);
 	iImageZoomField->setMinimum(0.0);
 	iImageZoomField->setValue(1.0);
+	iImageZoomField->setSingleStep(0.1);
 	QObject::connect(iImageZoomField , SIGNAL(valueChanged(double)), 
 		this, SLOT(ImageZoomChanged(double))); 
 
@@ -859,21 +858,20 @@ void CInfoPanel::SetSourceImage(CImage *source){
 
 	//IMAGE BASIC Settings
 //	iImageZoomCheckBox->setChecked(source->GetTextDisplay(EDisplayTextZoom));
-//	iImageZoomField->setValue(source->GetZoom());
+	iImageZoomField->setValue(source->GetZoom());
 //	iImageWindowCheckbox->setChecked(source->GetTextDisplay(EDisplayTextWindow));
 	iImageWindowCenter->setValue(source->GetImageWindow().center);
 	iImageWindowWidth->setValue(source->GetImageWindow().width);
 //	iImageOrientationCheckBox->setChecked(source->GetTextDisplay(EDisplayTextOrientation));
 //	iImageFrameDataCheckbox->setChecked(source->GetTextDisplay(EDisplayTextFrameData));
 
-/* ///////////////////////////////////
+ ///////////////////////////////////
 
 	//save frame number before it will be changed by setmaximum
-//	int frameNr = source->GetActualFrameNr();
+	int frameNr = source->GetActualFrameNr();
 	iImageFrameDataField->setMinimum(0);
 	iImageFrameDataField->setMaximum(source->GetActualTextureDepth()-1);
-//	iImageFrameDataField->setValue(frameNr);
-
+	iImageFrameDataField->setValue(frameNr);
 	
 	//DICOM HEADER
 	//std::cout << source->GetTexture()->GetDicomHeader().GetSeriesInfo().GetSeriesInstanceUID();
@@ -893,12 +891,12 @@ void CInfoPanel::SetSourceImage(CImage *source){
 		iTableHeader->setItem(row,0,new QTableWidgetItem("Slice thickness"));
 		float sliceThickness =0;
 		try{
-//			int frameNr = source->GetActualFrameNr();
-//			if(source->GetOrientation() != EImageOrientationAxial)
+			int frameNr = source->GetActualFrameNr();
+			if(source->GetOrientation() != EImageOrientationAxial)
 			{
-//				frameNr = 0;//default
+				frameNr = 0;//default
 			}
-//			CDicomHeader& header = source->GetTexture()->GetDicomHeader(frameNr);
+			CDicomHeader& header = source->GetTexture()->GetDicomHeader(frameNr);
 		
 			sliceThickness = header.GetImageInfo().GetSliceThickness();
 			iTableHeader->setItem(row,1,new QTableWidgetItem(QString::number(sliceThickness)));
@@ -924,7 +922,7 @@ void CInfoPanel::SetSourceImage(CImage *source){
 	//DERIVED IMAGES TABLE
 	iTableOfOpenedImageCopies->clearContents();
 	//Has it derived images ?? if yes it is image in image explorer window
-//	QListIterator<CImage*> images(source->GetDerivedImages());
+	QListIterator<CImage*> images(source->GetDerivedImages());
 	images.toFront();
 	row=0;
 	while(images.hasNext())
@@ -942,7 +940,7 @@ void CInfoPanel::SetSourceImage(CImage *source){
 		item->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
 		row++;	
 	}
-	
+/*	
 	//Animation
 	if(source)
 	{

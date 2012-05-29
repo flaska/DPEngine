@@ -23,13 +23,13 @@ class CImage : public CObject{
 public:
 	CImage(CObject *parentWindow,QString &file, QPointF &position, QPointF &size);
 	CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position, QPointF &size );
+	void Init(CObject *parentWindow, QPointF& position, QPointF &size);
 	void setImageFromFile(QString filename);
 	void SetParentWorkspace(CWorkspace *workspace);
 	QImage* getCompleteImage();
 	QImage* getCropImage();
 	void SetGeometry(float x, float y, float width, float height);
 	void DrawImage();
-	void Init(CObject *parentWindow, QPointF& position, QPointF &size);
 	CDicom3DTexture *GetTexture();
 	void SetZoom(float zoom);
 	void SetManipulated(TManipulationState manipulated);
@@ -46,8 +46,15 @@ public:
 	void paint(QPainter*);
 	void wheelEvent(QWheelEvent *event);
 	float GetActualTextureDepth();
-private:
+	float GetZoom();
+	int GetActualFrameNr();
 	void MoveToFrame(int frame);
+	TImageAxisOrientation GetOrientation();
+	QList<CImage *>& GetDerivedImages();
+	CWorkspace* GetParentWorkspace();
+	QString& GetName();
+	void SetName(const QString& name);
+private:
 	void MoveToDepth(float inDepthPosition);
 	QImage* iActualSliceCompleteImage;
 	QImage* iActualSliceCropImage;

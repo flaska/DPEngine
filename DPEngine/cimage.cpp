@@ -29,6 +29,7 @@ CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &
 	iActualSliceCompleteImage = NULL;
 	iActualSliceCropImage = NULL;
 	iImageAxisOrientation=EImageOrientationAxial;
+	Init(parentWindow, position, size);
 	if(!C3DTextureManager::GetInstance())
 	{
 //TODO		throw TextureNotCreatedException(); 
@@ -55,6 +56,7 @@ CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position
 	iImageAxisOrientation = EImageOrientationAxial;
 	iActualSliceCompleteImage = NULL;
 	iActualSliceCropImage = NULL;
+	Init(parentWindow, position, size);
 	if(!texture)
 	{
 //TODO		throw DicomFramesException();
@@ -87,69 +89,9 @@ CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position
 
 void CImage::PrepareSlice(){
 	int y = 20*iActualTextureCoords.bottomLeft.GetZ();
-	std::cout << y;
-	/*
-	DicomImage *iDicomImage=iTexture->GetDicomImage();
-	TDicomImagesInfo iImagesInfo;
-	int x = iTexture->iFrames->GetImagesInfo().framesCount;
-	std::cout << x;
-	quint8* iData = new quint8[iDicomImage->getOutputDataSize()];
-	iDicomImage->setWindow(iTexture->iFrames->GetImagesInfo().window.center,iTexture->iFrames->GetImagesInfo().window.width);
-	//iDicomImage->getOutputData(iData,iDicomImage->getOutputDataSize(8),8,y);
-	iDicomImage->getOutputData(iData,iDicomImage->getOutputDataSize(8),8,0);
-
-	std::cout << iDicomImage->getOutputDataSize(8) << std::endl;
-	for (int i=0; i<iDicomImage->getOutputDataSize(8); i++)
-		std::cout << iData[i] << std::endl;
-
-	
-	iImagesInfo.bps=iDicomImage->getDepth();
-	unsigned int sum = 0;
-	unsigned int sum2=0;
-	int poc=0;
-	int maxx=0;
-	int minn=+32767;
-	int vals[65536];
-	for(int i=0;i<65536;i++)
-	{
-		vals[i]=0;
-	}
-	for (int i=0;i<iTexture->iFrames->GetImagesInfo().height*iTexture->iFrames->GetImagesInfo().width;i++)
-	{
-		if(iTexture->iFrames->GetImagesInfo().bps==17)
-		{//specialized actions for brain
-			//iData[i] -= 32767;
-			//iData[i] *= 16;
-		}
-		quint8 a=iData[i];
-		if(a!=-32768)
-		{
-			a=a;
-		}
-
-		if (a>maxx)
-			maxx=a;
-		if(a<minn)
-			minn=a;
-		a=abs(a);
-		if(a<65537)
-		{
-			vals[a]++;
-			a=a-2147483648;
-			poc++;
-			sum+=iData[i];
-			sum2+=iData[i]*iData[i];
-		}
-	}
-	*/
-
 	quint8* dicomrawdata8bit = (quint8*)iTexture->iFrames->GetImageData();
-
 	dicomrawdata8bit = dicomrawdata8bit+(iTexture->iFrames->GetImagesInfo().frameQuintsCount*y) ;
-
-
 	uchar * dicomrawdata16bit = (uchar*)dicomrawdata8bit;
-
 	int dicomrawdatawidth = iTexture->iFrames->GetWidth();
 	int dicomrawdataheight = iTexture->iFrames->GetHeight();
 	int dicomrawdatabytesperline = iTexture->iFrames->GetWidth();
@@ -167,7 +109,6 @@ void CImage::PrepareSlice(){
 			imageLine[x]=qRgb(newintensity,newintensity,newintensity);
 		}
 	}
-
 	if (iActualSliceCompleteImage)
 		delete iActualSliceCompleteImage;
 	iActualSliceCompleteImage = new QImage(img);
@@ -269,11 +210,11 @@ void CImage::Init(CObject *parentWindow, QPointF& position, QPointF &size )
 	iParentWorkspace = NULL;
 //TODO	iAnimation = NULL;
 	iName = new QString();
-//TODO	SetOrientation(EImageOrientationAxial);
+	//SetOrientation(EImageOrientationAxial);
 	QString name;
 	name.clear();
 	name.append("image");
-//TODO	SetName(name);
+	SetName(name);
 	iManipulated = EManipNone;
 	iOwner = NULL;
 	iParentWorkspace=NULL;
@@ -283,11 +224,11 @@ void CImage::Init(CObject *parentWindow, QPointF& position, QPointF &size )
 	iPosition=position;
 	iSize=size;
 	//slider
-//TODO	iFrameSlider.position.setX( 10);
-//TODO	iFrameSlider.size.setY(15);
-//TODO	iFrameSlider.size.setX(iSize.x() - iFrameSlider.position.x() - 25); //iSize.x() - size.x()
-//TODO	iFrameSlider.position.setY(iSize.y() - iFrameSlider.size.y()-2);
-//TODO	iFrameSlider.data=0;
+	iFrameSlider.position.setX( 10);
+	iFrameSlider.size.setY(15);
+	iFrameSlider.size.setX(iSize.x() - iFrameSlider.position.x() - 25); //iSize.x() - size.x()
+	iFrameSlider.position.setY(iSize.y() - iFrameSlider.size.y()-2);
+	iFrameSlider.data=0;
 	//	iFrames = NULL;
 	iZoomFactor=1.0;
 	iImageCenter = QPointF(0.5,0.5);
@@ -565,6 +506,13 @@ void CImage::wheelEvent(QWheelEvent *event){
 	{
 		MoveToFrame(iFrameSlider.data-1);
 	}
+	if(CInfoPanel::GetInstance())
+	{
+		if(CInfoPanel::GetInstance()->GetSourceImage() == this)
+		{
+			CInfoPanel::GetInstance()->SetSourceImage(this);
+		}
+	}
 }
 
 void CImage::MoveToFrame(int frame){
@@ -662,6 +610,33 @@ float CImage::GetActualTextureDepth()
 			return iTexture->GetDepth();
 		}
 	}
+}
+
+TImageAxisOrientation CImage::GetOrientation()
+{
+	//return iImageAxisOrientation;
+	return EImageOrientationAxial;
+}
+
+QList<CImage *>& CImage::GetDerivedImages()
+{
+	return iDerivedImages;
+}
+
+CWorkspace * CImage::GetParentWorkspace()
+{
+	return iParentWorkspace;
+}
+
+QString& CImage::GetName()
+{
+	return *iName;
+}
+
+void CImage::SetName(const QString& name)
+{
+	iName->clear();
+	iName->append(name);
 }
 
 CImage* CImage::CreateDerivedImage(TImageAxisOrientation orientation)
@@ -765,4 +740,14 @@ void CImage::paint(QPainter* painter){
 	painter->drawImage(QRect(QPoint(GetPosition().x()+GetBorders().left,GetPosition().y()+GetBorders().top),QPoint(GetPosition().x()+GetSize().x()-GetBorders().right,GetPosition().y()+GetSize().y()-GetBorders().bottom)),img);
 	DrawBorderRect(painter);
 	DrawIcons(painter);
+}
+
+float CImage::GetZoom()
+{
+	return iZoomFactor;
+}
+
+int CImage::GetActualFrameNr()
+{
+	return iFrameSlider.data;
 }

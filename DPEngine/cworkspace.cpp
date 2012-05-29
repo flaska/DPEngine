@@ -14,6 +14,7 @@ CWorkspace::CWorkspace(CObject *parent, const QPointF &position, const QPointF &
 	iLastInnerHeight = 0;
 	iLastInnerWidth = 0;
 	iLayout = NULL;
+	iName = new QString();
 	SetSize(QPointF(size.x(),size.y()));
 	iLayout = new CGrowingGridLayout(this,EGrowinGridLayoutHorizontal);
 	SetBorders(Settings::GetBordersConstant(EWorkspaceBorders));
@@ -27,6 +28,10 @@ CImage* CWorkspace::GetActiveImage()
 	return iActiveImage;
 }
 
+QString& CWorkspace::GetName()
+{
+	return *iName;
+}
 
 void CWorkspace::resizeEvent(QSize size){
 	SetSize(QPointF(size.width(),size.height()));

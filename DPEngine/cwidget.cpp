@@ -24,6 +24,7 @@ CWidget::CWidget(QWidget *parent){
 	CImageExplorer::InitInstance(this, imageExplorerPos,imageExplorerSize);
 	iImageExplorer = CImageExplorer::GetInstance();
 	LoadIcons();
+	iActiveObject=NULL;
 
 }
 
@@ -163,6 +164,10 @@ void CWidget::paint(){
 	}
 	CImageExplorer::GetInstance()->paint(qpainter);
 	CWorkspaceExplorer::GetInstance()->paint(qpainter);
+
+	if (iActiveObject){
+		iActiveObject->DrawSelection(qpainter);
+	}
 	qpainter->end();
 	setPixmap(*pixmap);
 	repaint();

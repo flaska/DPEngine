@@ -27,7 +27,9 @@ public:
 	void SetGeometry(float x, float y, float w, float h);
 	CWorkspaceSnapshot& GetSnapshot();
 	CImage* GetActiveImage();
+	QString& GetName();
 //private:
+	QString* iName;
 	MWorkspaceLayout *iLayout;
 	QImage* iWorkspaceImage;
 	QList<CImage*> iImages;
