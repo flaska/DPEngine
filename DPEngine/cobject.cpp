@@ -161,9 +161,6 @@ bool CObject::IsOnCloseIcon(int x, int y)
 
 bool CObject::IsOnResizeIcon(int x, int y)
 {
-
-		std::cout << "Resize Icon Real Position LT: x" << iResizeIcon.position.x() + iPosition.x()<< " y " << iResizeIcon.position.y() + iPosition.y() << std::endl;
-		std::cout << "Resize Icon Real Position RB: x" << iResizeIcon.position.x()+iResizeIcon.size.x() + iPosition.x()<< " y " << iResizeIcon.position.y()+iResizeIcon.size.y() + iPosition.y()<< std::endl;
 	if(!iResizeAbility  )return false;
 
 	if(x<iResizeIcon.position.x())

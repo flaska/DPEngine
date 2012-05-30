@@ -54,6 +54,7 @@ public:
 	CWorkspace* GetParentWorkspace();
 	QString& GetName();
 	void SetName(const QString& name);
+	void DrawManipulation(QPainter* painter);
 private:
 	void MoveToDepth(float inDepthPosition);
 	QImage* iActualSliceCompleteImage;

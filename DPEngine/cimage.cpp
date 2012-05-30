@@ -265,15 +265,14 @@ void CImage::SetZoom(float zoom)
 	CWidget::GetInstance()->paint();
 }
 
+void CImage::SetManipulated(TManipulationState manipulated)
+{
+	iManipulated=manipulated;
+}
+
 CDicom3DTexture *CImage::GetTexture()
 {
 	return iTexture;
-}
-
-void CImage::SetManipulated(TManipulationState manipulated)
-{
-
-	iManipulated=manipulated;
 }
 
 void CImage::mousePressEvent(QMouseEvent *event)
@@ -368,9 +367,6 @@ void CImage::mouseReleaseEvent(QMouseEvent *event)
 void CImage::SetImageWindow(TImageWindow window)
 {
 	iImageWindow = window;
-	std::cout << "imagewindow width " << iImageWindow.width << std::endl;
-	std::cout << "imagewindow center " << iImageWindow.center << std::endl;
-
 	float cd= iTexture->GetWindowDefaults().center;
 	float wd =iTexture->GetWindowDefaults().width;
 	float bias;
@@ -740,7 +736,28 @@ void CImage::paint(QPainter* painter){
 	if (img.isNull()) return;
 	painter->drawImage(QRect(QPoint(GetPosition().x()+GetBorders().left,GetPosition().y()+GetBorders().top),QPoint(GetPosition().x()+GetSize().x()-GetBorders().right,GetPosition().y()+GetSize().y()-GetBorders().bottom)),img);
 	DrawBorderRect(painter);
+	if(iManipulated != EManipNone)
+		DrawManipulation(painter);
 	DrawIcons(painter);
+}
+
+void CImage::DrawManipulation(QPainter* painter)
+{
+	if(iManipulated == EManipNone)
+		return;
+	if(iManipulated==EManipAllowed)
+	{
+		QRect position = QRect(QPoint(GetPosition().x()+GetBorders().left,GetPosition().y()+GetBorders().top),QPoint(GetPosition().x()+GetSize().x()-GetBorders().right,GetPosition().y()+GetSize().y()-GetBorders().bottom));
+		QColor color = QColor(0, 255, 0, 80);
+		painter->fillRect(position,color);
+	}
+	if(iManipulated==EManipDissalowed)
+	{
+		QRect position = QRect(QPoint(GetPosition().x()+GetBorders().left,GetPosition().y()+GetBorders().top),QPoint(GetPosition().x()+GetSize().x()-GetBorders().right,GetPosition().y()+GetSize().y()-GetBorders().bottom));
+		QColor color = QColor(255, 0, 0, 80);
+		painter->fillRect(position,color);
+	}
+
 }
 
 float CImage::GetZoom()
