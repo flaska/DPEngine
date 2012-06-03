@@ -115,7 +115,21 @@ void CImage::PrepareSlice(){
 
 	}
 	if (GetOrientation()==EImageOrientationSagittal){
-
+		int shift = 2000*iActualTextureCoords.bottomLeft.GetX();
+		if (shift>511) shift = 511;
+		int frameints = iTexture->iFrames->GetImagesInfo().frameQuintsCount;
+		int i=0;
+		int width = iTexture->iFrames->GetImagesInfo().width;
+		std::cout << "Line " << shift << " " << std::endl;
+		for (int f=0; f<iTexture->iFrames->GetImagesInfo().framesCount; f++){
+			int start = f*frameints;
+			for (int y=0; y<iTexture->iFrames->GetImagesInfo().height; y++){
+				dicomrawdata8bitCopy[i]=dicomrawdata8bit[y*width+start+shift];
+				i++;
+			}
+		}
+		dicomrawdataheight = iTexture->iFrames->GetImagesInfo().framesCount;
+		dicomrawdata16bit = (uchar*)dicomrawdata8bitCopy;
 	}
 	if (GetOrientation()==EImageOrientationCoronal){
 		int z = 2000*iActualTextureCoords.bottomLeft.GetY();
