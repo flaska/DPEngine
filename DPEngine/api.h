@@ -32,6 +32,7 @@ private:
 class libraryLoader : public QObject {
 	Q_OBJECT
 public:
+	~libraryLoader();
 	libraryLoader();
 	void init();
 private:

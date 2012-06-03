@@ -16,6 +16,10 @@ libraryLoader::libraryLoader(){
 
 }
 
+libraryLoader::~libraryLoader(){
+	FreeLibrary(LoadedLibrary);
+}
+
 void libraryLoader::init(){
 	libraryFilename="LouckyDLL.dll"; 
 	LoadedLibrary = LoadLibrary(TEXT("LouckyDLL.dll"));
@@ -237,20 +241,22 @@ void libraryLoader::initRun(){
 
 int libraryLoader::intHandler(int elemeintid, int iPar){
 	intFunction* func=intFunctionTable[elemeintid];
-	func(iPar);
+	//func(iPar);
 	return 0;
 }
 
 int libraryLoader::charHandler(int elemeintid, int cPar){
 	charFunction* func=charFunctionTable[elemeintid];
-	func(cPar);
+	//func(cPar);
 	return 0;
 }
 
 int libraryLoader::mainHandler(int elemeintid){
+
 	initRun();
 	mainFunction* func=mainFunctionTable[elemeintid];
 	func();
+	FreeLibrary(LoadedLibrary);
 	QWidget* w = new QWidget();
 	QGridLayout* ly=new QGridLayout();
 	QPixmap *image = new QPixmap("projekt-seg.ppm","PPM");
