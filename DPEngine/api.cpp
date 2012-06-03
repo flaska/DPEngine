@@ -268,9 +268,15 @@ int libraryLoader::mainHandler(int elemeintid){
 
 
 void libraryLoader::backToMain(){
-	system(QString("convert projekt-seg.ppm projekt-seg.jpg").toAscii().data());
-	system(QString("img2dcm projekt-seg.jpg projekt-seg.dcm").toAscii().data());
-	CImageExplorer::GetInstance()->OpenImage(QString("projekt-seg.dcm"));
+	system(QString("convert -separate projekt-seg.ppm projekt-seg.jpg").toAscii().data());
+	system(QString("convert -define png:bit-depth=8 projekt-seg-2.jpg projekt-seg.png").toAscii().data());
+	system(QString("convert projekt-seg.png projekt-seg.jpg").toAscii().data());
+	system(QString("img2dcm projekt-seg.jpg IM-0001-0001.dcm").toAscii().data());
+	CImageExplorer::GetInstance()->OpenImage(QString("IM-0001-0001.dcm"));
+	remove("projekt-seg-0.jpg");
+	remove("projekt-seg-1.jpg");
+	remove("projekt-seg-2.jpg");
+	remove("projekt-seg.png");
 	remove("projekt-seg.jpg");
 	remove("projekt-seg.dcm");
 }
