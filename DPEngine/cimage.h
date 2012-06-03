@@ -18,6 +18,15 @@ typedef enum{
 }
 TManipulationState;
 
+typedef enum
+{
+	EDisplayTextZoom = 1,
+	EDisplayTextOrientation = 2,
+	EDisplayTextWindow = 4,
+	EDisplayTextFrameData = 8,
+	EDisplayTextAll = 1073741823
+}TDiplayText;
+
 class CWorkspace;
 class CImage : public CObject{
 public:
@@ -55,6 +64,11 @@ public:
 	QString& GetName();
 	void SetName(const QString& name);
 	void DrawManipulation(QPainter* painter);
+	void DrawTexts(QPainter* painter);
+	bool GetTextDisplay(TDiplayText displayText);
+	void SetTextDisplay(TDiplayText displayText, bool on);
+	void save(QString& filename);
+	void SetOrientation(TImageAxisOrientation orientation);
 private:
 	void MoveToDepth(float inDepthPosition);
 	QImage* iActualSliceCompleteImage;

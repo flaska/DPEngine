@@ -66,6 +66,7 @@ CDicom3DTexture *C3DTextureManager::LoadTexture(QString &fileName)
 	CDicomHeader header;
 	if(!header.LoadFromFile(fileName.toAscii().data()))
 	{
+		CDicom3DTexture *texture= new CDicom3DTexture (fileName);
 		return NULL;
 	}
 	QString seriesUIDstr(header.GetSeriesInfo().GetSeriesInstanceUID ());

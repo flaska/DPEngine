@@ -46,7 +46,6 @@ public:
 	static CInfoPanel* GetInstance();
 	void SetSourceImage(CImage *source);
 	void SelectDerivedImage(CImage *image);
-
 private:
 	static bool iDeleted;
 	static CInfoPanel *instance;	

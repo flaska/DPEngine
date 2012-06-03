@@ -83,8 +83,8 @@ CDicom3DTexture::CDicom3DTexture(QString &fileName)
 			
 		}
 		break;
-	default:
-		assert(1==0); //TODO other color depths
+	default: ;
+		//assert(1==0); //TODO other color depths
 	}
 
 	iWidth = iFrames->GetWidth();

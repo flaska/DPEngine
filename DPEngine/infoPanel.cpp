@@ -117,7 +117,7 @@ void CInfoPanel::ImageWindowCenterChanged(int value)
 	{
 		if(iSourceImage)
 		{
-//		iSourceImage->SetTextDisplay(EDisplayTextFrameData, value);
+		iSourceImage->SetTextDisplay(EDisplayTextFrameData, value);
 		}
 	}
 void CInfoPanel::ImageFrameDataChanged(int value){
@@ -152,14 +152,14 @@ void CInfoPanel::ImageWindowChecked(int value)
 {
 	if(iSourceImage)
 	{
-//		iSourceImage->SetTextDisplay(EDisplayTextWindow, value);
+		iSourceImage->SetTextDisplay(EDisplayTextWindow, value);
 	}
 }
 void CInfoPanel::ImageOrientationChecked(int value)
 {
 	if(iSourceImage)
 	{
-//		iSourceImage->SetTextDisplay(EDisplayTextOrientation, value);
+		iSourceImage->SetTextDisplay(EDisplayTextOrientation, value);
 
 	}
 }
@@ -167,7 +167,7 @@ void CInfoPanel::ImageZoomChecked(int value)
 {
 	if(iSourceImage)
 	{
-//		iSourceImage->SetTextDisplay(EDisplayTextZoom, value);
+		iSourceImage->SetTextDisplay(EDisplayTextZoom, value);
 	}
 }
 void CInfoPanel::ImageOrientationSelected( const QString& str)
@@ -175,7 +175,7 @@ void CInfoPanel::ImageOrientationSelected( const QString& str)
 	int index = iComboImageOrientation->currentIndex();
 	if(iSourceImage)
 	{
-//		iSourceImage->SetOrientation((TImageAxisOrientation)index);
+		iSourceImage->SetOrientation((TImageAxisOrientation)index);
 	}
 
 }
@@ -184,7 +184,7 @@ void	CInfoPanel::ImageNameChanged(const QString& text)
 	if(iSourceImage)
 	{
 
-//		iSourceImage->SetName(iTxtImageName->text());
+		iSourceImage->SetName(iTxtImageName->text());
 	}
 }
 
@@ -734,10 +734,10 @@ void CInfoPanel::SetImageExplorerInfoView()
 	SetSourceImage(image);
 	if(iSourceImage)
 	{
-//		iTxtImageName->setText(iSourceImage->GetName());
+		iTxtImageName->setText(iSourceImage->GetName());
 
-//		TImageAxisOrientation imageOrientation = iSourceImage->GetOrientation();
-//		iComboImageOrientation->setCurrentIndex((int)imageOrientation);
+		TImageAxisOrientation imageOrientation = iSourceImage->GetOrientation();
+		iComboImageOrientation->setCurrentIndex((int)imageOrientation);
 	}
 }
 CInfoPanel::CInfoPanel(QDockWidget *parent)
@@ -857,13 +857,13 @@ void CInfoPanel::SetSourceImage(CImage *source){
 		return;
 
 	//IMAGE BASIC Settings
-//	iImageZoomCheckBox->setChecked(source->GetTextDisplay(EDisplayTextZoom));
+	iImageZoomCheckBox->setChecked(source->GetTextDisplay(EDisplayTextZoom));
 	iImageZoomField->setValue(source->GetZoom());
-//	iImageWindowCheckbox->setChecked(source->GetTextDisplay(EDisplayTextWindow));
+	iImageWindowCheckbox->setChecked(source->GetTextDisplay(EDisplayTextWindow));
 	iImageWindowCenter->setValue(source->GetImageWindow().center);
 	iImageWindowWidth->setValue(source->GetImageWindow().width);
-//	iImageOrientationCheckBox->setChecked(source->GetTextDisplay(EDisplayTextOrientation));
-//	iImageFrameDataCheckbox->setChecked(source->GetTextDisplay(EDisplayTextFrameData));
+	iImageOrientationCheckBox->setChecked(source->GetTextDisplay(EDisplayTextOrientation));
+	iImageFrameDataCheckbox->setChecked(source->GetTextDisplay(EDisplayTextFrameData));
 
  ///////////////////////////////////
 

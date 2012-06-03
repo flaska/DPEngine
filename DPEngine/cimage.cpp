@@ -6,6 +6,7 @@
 #include <cimageexplorer.h>
 #include <workspacemanager.h>
 #include <infopanel.h>
+#include <exception>
 
 
 void CImage::setImageFromFile(QString filename){
@@ -611,8 +612,8 @@ float CImage::GetActualTextureDepth()
 
 TImageAxisOrientation CImage::GetOrientation()
 {
-	//return iImageAxisOrientation;
-	return EImageOrientationAxial;
+	return iImageAxisOrientation;
+	//return EImageOrientationAxial;
 }
 
 QList<CImage *>& CImage::GetDerivedImages()
@@ -739,6 +740,7 @@ void CImage::paint(QPainter* painter){
 	if(iManipulated != EManipNone)
 		DrawManipulation(painter);
 	DrawIcons(painter);
+	DrawTexts(painter);
 }
 
 void CImage::DrawManipulation(QPainter* painter)
@@ -768,4 +770,178 @@ float CImage::GetZoom()
 int CImage::GetActualFrameNr()
 {
 	return iFrameSlider.data;
+}
+
+bool CImage::GetTextDisplay(TDiplayText displayText)
+{
+	return ((iDisplayTextSettings & displayText) == displayText);
+}
+
+void CImage::SetTextDisplay(TDiplayText displayText, bool on)
+{
+	if(on)
+	{
+		iDisplayTextSettings |= displayText;
+	}
+	else
+	{
+		iDisplayTextSettings &= ~displayText;
+	}
+	if(iParentWorkspace)
+	{
+		//iParentWorkspace->UpdateTexture();
+	}
+	CWidget::GetInstance()->paint();
+}
+
+void CImage::DrawTexts(QPainter* painter){
+	QPoint imagePosition = QPoint(GetPosition().x()+GetBorders().left,GetPosition().y()+GetBorders().top);
+	int y = 40;
+	if((iDisplayTextSettings & EDisplayTextZoom) == EDisplayTextZoom)
+	{
+		QString text = QString("zoom: ").append(QString::number(iZoomFactor,103,4));		
+		painter->drawText(imagePosition+QPoint(0,y),text);
+		y+=15;
+	}
+	if((iDisplayTextSettings & EDisplayTextWindow) == EDisplayTextWindow)
+	{
+		QString textC = QString("c: ").append( QString::number(iImageWindow.center ,103,6));
+		QString textW = QString("w: ").append( QString::number(iImageWindow.width ,103,6));
+		painter->drawText(imagePosition+QPoint(0,y),textC);
+		y+=15;
+		painter->drawText(imagePosition+QPoint(0,y),textW);
+		y+=15;
+	}
+	if((iDisplayTextSettings & EDisplayTextOrientation) == EDisplayTextOrientation)
+	{
+		char rightOrientation, leftOrientation;
+		//try
+		{
+			int frameNr= GetActualFrameNr();
+			if(GetOrientation() != EImageOrientationAxial)
+			{
+				frameNr = 0;
+			}
+			TImageOrientation imageOrientation  = iTexture->GetDicomHeader(frameNr).GetImageInfo().GetImageOrientation();
+
+			double absX = fabs(imageOrientation.row.x);
+			double absY = fabs(imageOrientation.row.y);
+			double absZ = fabs(imageOrientation.row.z);
+			if (absX>.0001 && absX>absY && absX>absZ) {
+				rightOrientation = imageOrientation.row.x < 0 ? 'R' : 'L';
+				leftOrientation = imageOrientation.row.x > 0 ? 'R' : 'L';
+			}
+			else if (absY>.0001 && absY>absX && absY>absZ) {
+				rightOrientation = imageOrientation.row.y < 0 ? 'A' : 'P';
+				leftOrientation = imageOrientation.row.y > 0 ? 'A' : 'P';
+			}
+			else if (absZ>.0001 && absZ>absX && absZ>absY) {
+				rightOrientation = imageOrientation.row.z < 0 ? 'F' : 'H';
+				leftOrientation = imageOrientation.row.z > 0 ? 'F' : 'H';
+			}
+			//should depend on HFS and so on
+			char bottomOrientation, topOrientation;
+			absX = fabs(imageOrientation.column.x);
+			absY = fabs(imageOrientation.column.y);
+			absZ = fabs(imageOrientation.column.z);
+			if (absX>.0001 && absX>absY && absX>absZ) {
+				bottomOrientation = imageOrientation.column.x < 0 ? 'R' : 'L';
+				topOrientation = imageOrientation.column.x > 0 ? 'R' : 'L';
+			}
+			else if (absY>.0001 && absY>absX && absY>absZ) {
+				bottomOrientation = imageOrientation.column.y < 0 ? 'A' : 'P';
+				topOrientation = imageOrientation.column.y > 0 ? 'A' : 'P';
+			}
+			else if (absZ>.0001 && absZ>absX && absZ>absY) 
+			{
+				bottomOrientation = imageOrientation.column.z < 0 ? 'F' : 'H';
+				topOrientation = imageOrientation.column.z > 0 ? 'F' : 'H';
+			}
+				painter->drawText(imagePosition+QPoint(iSize.x()/2-15,20),QString("").append(topOrientation));				
+				painter->drawText(imagePosition+QPoint(iSize.x()/2-15,iSize.y()-30),QString("").append(bottomOrientation));	
+				painter->drawText(imagePosition+QPoint(15,iSize.y()/2),QString("").append(leftOrientation));	
+				painter->drawText(imagePosition+QPoint(iSize.x()-40,iSize.y()/2),QString("").append(rightOrientation));	
+		}
+		//catch (exception *e)
+		{
+		}
+	}
+	//Frame data on the slider
+if(GetTextDisplay(EDisplayTextFrameData) )
+	{
+			
+		QString text = QString("Frame: ").append(QString::number(iFrameSlider.data)).append("/").append(QString::number(GetActualTextureDepth()-1));
+		painter->drawText(imagePosition+QPoint(0,y),text);
+		y+=15;
+	}
+}
+
+void CImage::save(QString& filename){
+	if (iActualSliceCropImage)
+		iActualSliceCropImage->save(filename,"PGM",100);
+}
+
+void CImage::SetOrientation(TImageAxisOrientation orientation){
+	if(iImageAxisOrientation == orientation){
+		return;
+	}
+	int frameSliderData;
+	switch(orientation)
+	{
+	case EImageOrientationAxial:
+		{
+			frameSliderData = iLastAxialPosition;
+			iActualTextureCoords.bottomLeft = CPoint3Df(0,0,0);
+			iActualTextureCoords.bottomRight = CPoint3Df(1,0,0);
+			iActualTextureCoords.topRight = CPoint3Df(1,1,0);
+			iActualTextureCoords.topLeft = CPoint3Df(0,1,0);
+		}
+		break;
+	case EImageOrientationSagittal: //zleva doprava
+		{
+			frameSliderData = iLastSagittalPosition;
+			iActualTextureCoords.bottomLeft = CPoint3Df(0,0,0);
+			iActualTextureCoords.bottomRight = CPoint3Df(0,1,0);
+			iActualTextureCoords.topRight = CPoint3Df(0,1,1);
+			iActualTextureCoords.topLeft = CPoint3Df(0,0,1);
+		}
+		break;
+	case EImageOrientationCoronal: //zezadu dopredu
+		{
+			frameSliderData = iLastCoronalPosition;
+			iActualTextureCoords.bottomLeft = CPoint3Df(0,0,0);
+			iActualTextureCoords.bottomRight = CPoint3Df(1,0,0);
+			iActualTextureCoords.topRight = CPoint3Df(1,0,1);
+			iActualTextureCoords.topLeft = CPoint3Df(0,0,1);
+		}
+		break;
+	default:
+		break;
+	}
+	TImageAxisOrientation lastImageOrientation = iImageAxisOrientation;
+	switch(lastImageOrientation)
+	{
+	case EImageOrientationAxial:
+		{
+			iLastAxialPosition = iFrameSlider.data;
+		}
+		break;
+	case EImageOrientationSagittal: //zleva doprava
+		{
+			iLastSagittalPosition = iFrameSlider.data;
+		}
+		break;
+	case EImageOrientationCoronal: //zezadu dopredu
+		{
+			iLastCoronalPosition = iFrameSlider.data;
+		}
+		break;
+	default:
+		break;
+	}
+	iImageAxisOrientation = orientation;
+
+	float depth = (float)frameSliderData/(float)GetActualTextureDepth();
+	MoveToDepth(depth);
+	return;
 }
