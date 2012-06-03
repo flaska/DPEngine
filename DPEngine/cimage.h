@@ -69,6 +69,8 @@ public:
 	void SetTextDisplay(TDiplayText displayText, bool on);
 	void save(QString& filename);
 	void SetOrientation(TImageAxisOrientation orientation);
+	quint8* dicomrawdata8bitCopy;
+
 private:
 	void MoveToDepth(float inDepthPosition);
 	QImage* iActualSliceCompleteImage;
