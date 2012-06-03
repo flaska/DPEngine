@@ -10,7 +10,7 @@
 			>
 			<DebugSettings
 				Command="$(TargetPath)"
-				WorkingDirectory=""
+				WorkingDirectory="."
 				CommandArguments=""
 				Attach="false"
 				DebuggerType="3"
@@ -20,9 +20,9 @@
 				HttpUrl=""
 				PDBPath=""
 				SQLDebugging=""
-				Environment="PATH=$(QTDIR)\bin;$(PATH)"
+				Environment="PATH=$(QTDIR)\bin;.;$(QTDIR)\bin;$(PATH)"
 				EnvironmentMerge="true"
-				DebuggerFlavor=""
+				DebuggerFlavor="0"
 				MPIRunCommand=""
 				MPIRunArguments=""
 				MPIRunWorkingDirectory=""

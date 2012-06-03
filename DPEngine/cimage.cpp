@@ -38,8 +38,14 @@ CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &
 	}
 	iTexture = NULL;
 	iTexture= C3DTextureManager::GetInstance()->LoadTexture(file);
-	dicomrawdata8bitCopy=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().frameQuintsCount];
-	dicomrawdata8bitCopy2=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().frameQuintsCount*2];
+	try{
+		dicomrawdata8bitCopy=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount];
+		dicomrawdata8bitCopy2=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount*2];
+	}
+	catch (std::bad_alloc){
+		std::cout << "out of memory" << std::endl;
+		std::exit(0);
+	}
 
 	if(!iTexture)
 	{
@@ -67,8 +73,14 @@ CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position
 //TODO		throw DicomFramesException();
 	}
 	iTexture= texture;
-	dicomrawdata8bitCopy=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().frameQuintsCount];
-	dicomrawdata8bitCopy2=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().frameQuintsCount*2];
+	try{
+		dicomrawdata8bitCopy=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount];
+		dicomrawdata8bitCopy2=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount*2];
+	}
+	catch (std::bad_alloc){
+		std::cout << "out of memory" << std::endl;
+		std::exit(0);
+	}
 	if(!iTexture)
 	{
 		//TODO throw TextureNotCreatedException(); 
@@ -107,14 +119,8 @@ void CImage::PrepareSlice(){
 
 	if (GetOrientation()==EImageOrientationAxial){
 		int y = 20*iActualTextureCoords.bottomLeft.GetZ();
-		dicomrawdata8bit = dicomrawdata8bit+(0) ;
-		//dicomrawdata16bit = (uchar*)dicomrawdata8bit;
-		dicomrawdata16bit = new uchar[iTexture->iFrames->GetImagesInfo().frameQuintsCount];
-		for (int i=0; i<iTexture->iFrames->GetImagesInfo().frameQuintsCount; i++){
-			dicomrawdata16bit[i]=(uchar)dicomrawdata8bit[i+iTexture->iFrames->GetImagesInfo().frameQuintsCount*y];
-		}
-		
-
+		dicomrawdata8bit = dicomrawdata8bit+(iTexture->iFrames->GetImagesInfo().frameQuintsCount*y) ;
+		dicomrawdata16bit = (uchar*)dicomrawdata8bit;
 	}
 	if (GetOrientation()==EImageOrientationSagittal){
 		int shift = 2000*iActualTextureCoords.bottomLeft.GetX();
@@ -122,7 +128,6 @@ void CImage::PrepareSlice(){
 		int frameints = iTexture->iFrames->GetImagesInfo().frameQuintsCount;
 		int i=0;
 		int width = iTexture->iFrames->GetImagesInfo().width;
-		std::cout << "Line " << shift << " " << std::endl;
 		for (int f=0; f<iTexture->iFrames->GetImagesInfo().framesCount; f++){
 			int start = f*frameints;
 			for (int y=0; y<iTexture->iFrames->GetImagesInfo().height; y++){
@@ -132,6 +137,17 @@ void CImage::PrepareSlice(){
 		}
 		dicomrawdataheight = iTexture->iFrames->GetImagesInfo().framesCount;
 		dicomrawdata16bit = (uchar*)dicomrawdata8bitCopy;
+
+		for (int y=0;y<dicomrawdataheight;y++){
+			for (int x=0;x<width;x++){
+				dicomrawdata8bitCopy2[x+2*y*width]=dicomrawdata8bitCopy[x+y*width];
+			}
+			for (int x=0;x<width;x++){
+				dicomrawdata8bitCopy2[x+(2*y+1)*width]=(dicomrawdata8bitCopy[x+y*width]+dicomrawdata8bitCopy[x+(y+1)*width])/2;
+			}
+		}
+		dicomrawdataheight=2*dicomrawdataheight-2;
+		dicomrawdata16bit=dicomrawdata8bitCopy2;
 	}
 	if (GetOrientation()==EImageOrientationCoronal){
 		int z = 2000*iActualTextureCoords.bottomLeft.GetY();
@@ -141,7 +157,6 @@ void CImage::PrepareSlice(){
 		int i=0;
 		int line = (int)(10000*iActualTextureCoords.bottomLeft.GetY());
 		if (line>511) line = 511;
-		std::cout << "Line " << z << " " << std::endl;
 		for (int f=0; f<iTexture->iFrames->GetImagesInfo().framesCount; f++){
 			int start = f*frameints+line*iTexture->iFrames->GetImagesInfo().width;
 			for (int x=0; x<iTexture->iFrames->GetImagesInfo().width; x++){				
@@ -161,13 +176,11 @@ void CImage::PrepareSlice(){
 				dicomrawdata8bitCopy2[x+(2*y+1)*width]=(dicomrawdata8bitCopy[x+y*width]+dicomrawdata8bitCopy[x+(y+1)*width])/2;
 			}
 		}
-		dicomrawdataheight=2*dicomrawdataheight;
+		dicomrawdataheight=2*dicomrawdataheight-2;
 		dicomrawdata16bit=dicomrawdata8bitCopy2;
 
 	}
 	
-
-
 	QImage img = QImage(dicomrawdata16bit, dicomrawdatawidth, dicomrawdataheight, dicomrawdatabytesperline, QImage::Format_Indexed8);
 	img = img.convertToFormat(QImage::Format_RGB32);
 	if (img.isNull()) return;
@@ -192,6 +205,7 @@ void CImage::PrepareSlice(){
 void CImage::PrepareImageCrop(){
 	int width=iSize.x()-GetBorders().right-GetBorders().left;
 	int height=iSize.y()-GetBorders().bottom-GetBorders().top;
+	if (this->GetOrientation()==EImageOrientationCoronal || this->GetOrientation()==EImageOrientationSagittal) height=iSize.y()*2-GetBorders().bottom-GetBorders().top;
 	int xcenter = iImageCenter.x()*width;
 	int ycenter = iImageCenter.y()*height;
 	float xgapbefore = (xcenter - (((float)iTexture->GetWidth()/2)*iZoomFactor));
