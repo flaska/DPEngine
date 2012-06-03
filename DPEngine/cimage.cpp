@@ -309,7 +309,7 @@ void CImage::Init(CObject *parentWindow, QPointF& position, QPointF &size )
 	iOwner = NULL;
 	iParentWorkspace=NULL;
 	iScale = 1.0;
-	iBias = 0.3;
+	iBias = 0.0;
 	iParentWindow = parentWindow;
 	iPosition=position;
 	iSize=size;

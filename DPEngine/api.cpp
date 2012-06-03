@@ -278,7 +278,7 @@ void libraryLoader::backToMain(){
 	remove("projekt-seg-2.jpg");
 	remove("projekt-seg.png");
 	remove("projekt-seg.jpg");
-	remove("projekt-seg.dcm");
+	remove("IM-0001-0001.dcm");
 }
 
 
