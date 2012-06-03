@@ -362,10 +362,11 @@ drawLabel::drawLabel(){
 	
 	QPainter painter;
 	painter.begin((QPaintDevice*)iDrawPixmap);
+	painter.setFont(QFont("Arial", 10));
 	painter.setPen(Qt::red);
-	painter.drawText(QPoint(10,10),QString("left mouse button - inner area"));
+	painter.drawText(QPoint(10,30),QString("left mouse button - inner area"));
 	painter.setPen(Qt::blue);
-	painter.drawText(QPoint(10,20),QString("right mouse button - outer area"));
+	painter.drawText(QPoint(10,45),QString("right mouse button - outer area"));
 	painter.end();
 
 	setPixmap(*iDrawPixmap);
@@ -380,10 +381,11 @@ void libraryLoader::reset(){
 	iDrawImageLabel->iDrawPixmap->load("projekt-data.pgm","PGM");
 	QPainter painter;
 	painter.begin((QPaintDevice*)iDrawImageLabel->iDrawPixmap);
+	painter.setFont(QFont("Arial", 10));
 	painter.setPen(Qt::red);
-	painter.drawText(QPoint(10,10),QString("left mouse button - inner area"));
+	painter.drawText(QPoint(10,30),QString("left mouse button - inner area"));
 	painter.setPen(Qt::blue);
-	painter.drawText(QPoint(10,20),QString("right mouse button - outer area"));
+	painter.drawText(QPoint(10,45),QString("right mouse button - outer area"));
 	painter.end();
 	iDrawImageLabel->setPixmap(*(iDrawImageLabel->iDrawPixmap));
 	iDrawImageLabel->iMemoryPixmap->fill(Qt::black);
