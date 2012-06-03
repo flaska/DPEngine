@@ -70,6 +70,7 @@ public:
 	void save(QString& filename);
 	void SetOrientation(TImageAxisOrientation orientation);
 	quint8* dicomrawdata8bitCopy;
+	quint8* dicomrawdata8bitCopy2;
 
 private:
 	void MoveToDepth(float inDepthPosition);

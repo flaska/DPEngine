@@ -39,6 +39,7 @@ CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &
 	iTexture = NULL;
 	iTexture= C3DTextureManager::GetInstance()->LoadTexture(file);
 	dicomrawdata8bitCopy=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().frameQuintsCount];
+	dicomrawdata8bitCopy2=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().frameQuintsCount*2];
 
 	if(!iTexture)
 	{
@@ -67,6 +68,7 @@ CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position
 	}
 	iTexture= texture;
 	dicomrawdata8bitCopy=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().frameQuintsCount];
+	dicomrawdata8bitCopy2=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().frameQuintsCount*2];
 	if(!iTexture)
 	{
 		//TODO throw TextureNotCreatedException(); 
@@ -142,14 +144,26 @@ void CImage::PrepareSlice(){
 		std::cout << "Line " << z << " " << std::endl;
 		for (int f=0; f<iTexture->iFrames->GetImagesInfo().framesCount; f++){
 			int start = f*frameints+line*iTexture->iFrames->GetImagesInfo().width;
-			for (int x=0; x<iTexture->iFrames->GetImagesInfo().width; x++){
-				
+			for (int x=0; x<iTexture->iFrames->GetImagesInfo().width; x++){				
 				dicomrawdata8bitCopy[i]=dicomrawdata8bit[x+start];
 				i++;
 			}
 		}
 		dicomrawdataheight = iTexture->iFrames->GetImagesInfo().framesCount;
 		dicomrawdata16bit = (uchar*)dicomrawdata8bitCopy;
+
+		int width = iTexture->iFrames->GetImagesInfo().width;
+		for (int y=0;y<dicomrawdataheight;y++){
+			for (int x=0;x<width;x++){
+				dicomrawdata8bitCopy2[x+2*y*width]=dicomrawdata8bitCopy[x+y*width];
+			}
+			for (int x=0;x<width;x++){
+				dicomrawdata8bitCopy2[x+(2*y+1)*width]=(dicomrawdata8bitCopy[x+y*width]+dicomrawdata8bitCopy[x+(y+1)*width])/2;
+			}
+		}
+		dicomrawdataheight=2*dicomrawdataheight;
+		dicomrawdata16bit=dicomrawdata8bitCopy2;
+
 	}
 	
 
@@ -168,6 +182,8 @@ void CImage::PrepareSlice(){
 			imageLine[x]=qRgb(newintensity,newintensity,newintensity);
 		}
 	}
+
+
 	if (iActualSliceCompleteImage)
 		delete iActualSliceCompleteImage;
 	iActualSliceCompleteImage = new QImage(img);
