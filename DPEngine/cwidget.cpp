@@ -77,7 +77,11 @@ void CWidget::SetGeometry(int x, int y, int w, int h)
 	QPoint workspacePos(0,0);
 	QPoint workspaceSize(this->width()-Settings::imageExplorerSize,this->height()-Settings::imageExplorerSize);
 
-	CWorkspaceManager::GetInstance()->GetActiveWorkspace()->SetGeometry(workspacePos.x(),workspacePos.y(),
+	if (CWorkspaceManager::GetInstance()->GetActiveWorkspace())
+		CWorkspaceManager::GetInstance()->GetActiveWorkspace()->SetGeometry(workspacePos.x(),workspacePos.y(),
+		workspaceSize.x(),workspaceSize.y());
+	else if (CWorkspaceManager::GetInstance()->GetPlanarWorkspace())
+		CWorkspaceManager::GetInstance()->GetPlanarWorkspace()->SetGeometry(workspacePos.x(),workspacePos.y(),
 		workspaceSize.x(),workspaceSize.y());
 	QListIterator<CWorkspace*> workspaces((CWorkspaceManager::GetInstance()->GetWorkspaces()));
 	workspaces.toFront();
@@ -126,13 +130,13 @@ void CWidget::mousePressEvent(QMouseEvent *event)
 				paint();
 				return;
 			}
-		}/*
+		}
 		if(CWorkspaceManager::GetInstance()->GetPlanarWorkspace()->IsPointOnObject(event->x(),event->y())){
 			iActiveObject  = CWorkspaceManager::GetInstance()->GetPlanarWorkspace();
 			iActiveObject->mousePressEvent(event);
 			paint();
 			return;
-		}*/
+		}
 	}
 }
 /*
@@ -162,6 +166,11 @@ void CWidget::paint(){
 	if (CWorkspaceManager::GetInstance()->GetActiveWorkspace()) {
 		CWorkspaceManager::GetInstance()->GetActiveWorkspace()->paint(qpainter,QRect(QPoint(0,0),QPoint(this->width()-Settings::imageExplorerSize,this->height()-Settings::imageExplorerSize)));
 	}
+	else if(CWorkspaceManager::GetInstance()->PlanarWorkspaceExists())
+	{
+		CWorkspaceManager::GetInstance()->GetPlanarWorkspace()->paint(qpainter,QRect(QPoint(0,0),QPoint(this->width()-Settings::imageExplorerSize,this->height()-Settings::imageExplorerSize)));
+	}
+
 	CImageExplorer::GetInstance()->paint(qpainter);
 	CWorkspaceExplorer::GetInstance()->paint(qpainter);
 

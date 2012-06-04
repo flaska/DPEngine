@@ -72,7 +72,7 @@ private:
 		void AnimationStartFrameChanged(int val);
 		void CreateNewImageCopy();
 		void CreateNewWorkspace();
-		//void CreateNewPlanarWorkspace();
+		void CreateNewPlanarWorkspace();
 		void OpenNewImage();
 		void GlobalAnimationPauseChecked(int value);
 		void GlobalAnimationRestartAll();

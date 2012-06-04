@@ -123,11 +123,11 @@ void CImage::PrepareSlice(){
 		dicomrawdata16bit = (uchar*)dicomrawdata8bit;
 	}
 	if (GetOrientation()==EImageOrientationSagittal){
-		int shift = 2000*iActualTextureCoords.bottomLeft.GetX();
-		if (shift>511) shift = 511;
-		int frameints = iTexture->iFrames->GetImagesInfo().frameQuintsCount;
-		int i=0;
 		int width = iTexture->iFrames->GetImagesInfo().width;
+		int shift = width*iActualTextureCoords.bottomLeft.GetX();
+		if (shift>width) shift = width;
+		int frameints = iTexture->iFrames->GetImagesInfo().frameQuintsCount;
+		int i=0;		
 		for (int f=0; f<iTexture->iFrames->GetImagesInfo().framesCount; f++){
 			int start = f*frameints;
 			for (int y=0; y<iTexture->iFrames->GetImagesInfo().height; y++){
@@ -150,13 +150,14 @@ void CImage::PrepareSlice(){
 		dicomrawdata16bit=dicomrawdata8bitCopy2;
 	}
 	if (GetOrientation()==EImageOrientationCoronal){
-		int z = 2000*iActualTextureCoords.bottomLeft.GetY();
+		int width = iTexture->iFrames->GetImagesInfo().width;
+		int z = width*iActualTextureCoords.bottomLeft.GetY();
 		
 		//dicomrawdata8bitCopy = new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().frameQuintsCount];
 		int frameints = iTexture->iFrames->GetImagesInfo().frameQuintsCount;
 		int i=0;
-		int line = (int)(10000*iActualTextureCoords.bottomLeft.GetY());
-		if (line>511) line = 511;
+		int line = (int)(width*iActualTextureCoords.bottomLeft.GetY());
+		if (line>width) line = width;
 		for (int f=0; f<iTexture->iFrames->GetImagesInfo().framesCount; f++){
 			int start = f*frameints+line*iTexture->iFrames->GetImagesInfo().width;
 			for (int x=0; x<iTexture->iFrames->GetImagesInfo().width; x++){				
@@ -167,7 +168,6 @@ void CImage::PrepareSlice(){
 		dicomrawdataheight = iTexture->iFrames->GetImagesInfo().framesCount;
 		dicomrawdata16bit = (uchar*)dicomrawdata8bitCopy;
 
-		int width = iTexture->iFrames->GetImagesInfo().width;
 		for (int y=0;y<dicomrawdataheight;y++){
 			for (int x=0;x<width;x++){
 				dicomrawdata8bitCopy2[x+2*y*width]=dicomrawdata8bitCopy[x+y*width];
@@ -203,6 +203,14 @@ void CImage::PrepareSlice(){
 }
 
 void CImage::PrepareImageCrop(){
+	if (CWorkspaceManager::GetInstance()->GetPlanarWorkspace())
+	{
+		if (iActualSliceCropImage)
+			delete iActualSliceCropImage;
+		iActualSliceCropImage = new QImage(getCompleteImage()->copy());
+		return;
+	}
+
 	int width=iSize.x()-GetBorders().right-GetBorders().left;
 	int height=iSize.y()-GetBorders().bottom-GetBorders().top;
 	if (this->GetOrientation()==EImageOrientationCoronal || this->GetOrientation()==EImageOrientationSagittal) height=iSize.y()*2-GetBorders().bottom-GetBorders().top;

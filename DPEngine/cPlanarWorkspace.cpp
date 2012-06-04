@@ -6,6 +6,7 @@
 #include <workspaceManager.h>
 #include <cWorkspaceSnapshot.h>
 #include <settings.h>
+#include <cimageexplorer.h>
 
 
 CPlanarWorkspace::CPlanarWorkspace(CObject *parent, const QPointF &position, const QPointF &size):
@@ -35,6 +36,22 @@ CObject(parent, position, size){
 	iEventHistory = new QPoint();
 	iCursorHistory = new QPoint();
 	iSensitivity = 1000;
+
+	CImage* image = CImageExplorer::GetInstance()->iActiveImage;
+	iImage1 = image->CreateDerivedImage(EImageOrientationAxial);
+	iImage2 = image->CreateDerivedImage(EImageOrientationAxial);
+	iImage3 = image->CreateDerivedImage(EImageOrientationAxial);
+	iImage1->SetOrientation(EImageOrientationAxial);
+	iImage2->SetOrientation(EImageOrientationSagittal);
+	iImage3->SetOrientation(EImageOrientationCoronal);
+	iImage1->SetGeometry(0, 0, iSize.x()/2, iSize.y()/2);
+	iImage2->SetGeometry(iSize.x()/2, 0, iSize.x()/2, iSize.y()/2);
+	iImage3->SetGeometry(0, iSize.y()/2, iSize.x()/2, iSize.y()/2);
+	iImage1->MoveToDepth(0.01);
+	iImage2->MoveToDepth(0.086105675);
+	iImage3->MoveToDepth(0.02);
+	CWidget::GetInstance()->paint();
+
 }
 
 
@@ -54,14 +71,16 @@ void CPlanarWorkspace::SetGeometry(float x, float y, float w, float h){
 	iLastInnerWidth = innerWidth;
 	iLastInnerHeight = innerHeight;
 	CObject::SetGeometry(x,y,w,h);
-	UpdateTexture();
+	iImage1->SetGeometry(0,0, w/2, h/2);
+	iImage2->SetGeometry(w/2, 0, w/2, h/2);
+	iImage3->SetGeometry(0, h/2, w/2, h/2);	
 }
 
 void CPlanarWorkspace::UseImage(CImage *image){
 	iImage = image;
 	if(CWidget::GetInstance())
 	{
-		CWidget::GetInstance()->updateGL();
+		CWidget::GetInstance()->paint();
 	}
 }
 
@@ -97,7 +116,7 @@ void CPlanarWorkspace::SaveSnapshot(QString& fileName){
 		iSaveSnapshotFileName = NULL;
 	}
 	iSaveSnapshotFileName = new QString(fileName);
-	paintGL();
+	//paint();
 }
 
 int CPlanarWorkspace::GetSaveSnapshotWidth()
@@ -119,7 +138,34 @@ void CPlanarWorkspace::SetSaveSnapshotHeight(int height)
 }
 
 
-void CPlanarWorkspace::paintGL(){
+void CPlanarWorkspace::paint(QPainter* painter, QRect position){
+
+	QPixmap* outputpixmap = new QPixmap(iSize.x(),iSize.y());
+	outputpixmap->fill(Qt::black);
+	QPainter *qpainter = new QPainter();
+	qpainter->begin((QPaintDevice*)outputpixmap);
+	iImage1->paint(qpainter);
+	iImage2->paint(qpainter);
+	iImage3->paint(qpainter);
+	qpainter->drawLine(QPoint(iPlanarCrossPosition.x*iSize.x()/2,0),QPoint(iPlanarCrossPosition.x*iSize.x()/2,iSize.y()/2));//iPlanarCrossPosition.x*iSize.x()/2,
+	qpainter->drawLine(QPoint(0,iPlanarCrossPosition.y*iSize.y()/2),QPoint(iSize.x()/2,iPlanarCrossPosition.y*iSize.y()/2));
+
+	qpainter->drawLine(QPoint(iSize.x()/2+iPlanarCrossPosition.y*iSize.x()/2,0),QPoint(iSize.x()/2+iPlanarCrossPosition.y*iSize.x()/2,iSize.y()/2));//iPlanarCrossPosition.x*iSize.x()/2,
+	qpainter->drawLine(QPoint(iSize.x()/2,iPlanarCrossPosition.y*iSize.y()/2),QPoint(iSize.x(),iPlanarCrossPosition.y*iSize.y()/2));
+
+	qpainter->drawLine(QPoint(iPlanarCrossPosition.x*iSize.x()/2,iSize.y()/2),QPoint(iPlanarCrossPosition.x*iSize.x()/2,iSize.y()));//iPlanarCrossPosition.x*iSize.x()/2,
+	qpainter->drawLine(QPoint(0,iSize.y()/2+iPlanarCrossPosition.y*iSize.y()/2),QPoint(iSize.x()/2,iSize.y()/2+iPlanarCrossPosition.y*iSize.y()/2));
+
+	//qpainter->drawLine(QPoint(x,x),QPoint(x,x));
+	qpainter->end();
+	delete qpainter;
+
+	painter->drawPixmap(position,*outputpixmap);
+	DrawBorderRect(painter);
+	delete outputpixmap;
+	
+	
+	/*
 	if(!iImage){
 		glEnable(GL_BLEND);
 		return;
@@ -153,10 +199,10 @@ void CPlanarWorkspace::paintGL(){
 
 	DrawBorders();
 
-	glEnable(GL_BLEND);
+	glEnable(GL_BLEND);*/
 }
 
-void CPlanarWorkspace::DrawBorders(){
+void CPlanarWorkspace::DrawBorders(){/*
 	glColor4f( 0., 1., 1., 1.); 
     glLineWidth(10); 
     glBegin(GL_LINES); 
@@ -182,7 +228,7 @@ void CPlanarWorkspace::DrawBorders(){
     glBegin(GL_LINES); 
     glVertex2f( 1., 0.5); 
     glVertex2f( 0., 0.5); 
-    glEnd();
+    glEnd();*/
 }
 
 void CPlanarWorkspace::UpdateTexture(){
@@ -233,29 +279,33 @@ void CPlanarWorkspace::mouseMoveEvent(QMouseEvent *event){
 	QCursor::setPos(*iCursorHistory);
 	if(UserManipulatingSlice == SliceOrientation::z){
 		int dx = mouseAfterMovePositionX - iEventHistory->x();
-		int dy = iEventHistory->y() - mouseAfterMovePositionY;
-		if ((iPlanarCrossPosition.x+(float)dx/(float)iSensitivity>0.) && (iPlanarCrossPosition.x+(float)dx/(float)iSensitivity<1.))
-			iPlanarCrossPosition.x=iPlanarCrossPosition.x+(float)dx/(float)iSensitivity;
-		if ((iPlanarCrossPosition.y+(float)dy/(float)iSensitivity>0.) && (iPlanarCrossPosition.y+(float)dy/(float)iSensitivity<1.))
-			iPlanarCrossPosition.y=iPlanarCrossPosition.y+(float)dy/(float)iSensitivity;
+		int dy = -iEventHistory->y() + mouseAfterMovePositionY;
+		if ((iPlanarCrossPosition.x+(double)dx/(double)iSensitivity>0.) && (iPlanarCrossPosition.x+(double)dx/(double)iSensitivity<1.))
+			iPlanarCrossPosition.x=iPlanarCrossPosition.x+(double)dx/(double)iSensitivity;
+		if ((iPlanarCrossPosition.y+(double)dy/(double)iSensitivity>0.) && (iPlanarCrossPosition.y+(double)dy/(double)iSensitivity<1.))
+			iPlanarCrossPosition.y=iPlanarCrossPosition.y+(double)dy/(double)iSensitivity;
 	}
 	if(UserManipulatingSlice == SliceOrientation::x){
 		int dx = iEventHistory->x() - mouseAfterMovePositionX;
 		int dy = iEventHistory->y() - mouseAfterMovePositionY;
-		if ((iPlanarCrossPosition.y+(float)dy/(float)iSensitivity>0.) && (iPlanarCrossPosition.y+(float)dy/(float)iSensitivity<1.))
-			iPlanarCrossPosition.z=iPlanarCrossPosition.z+(float)dy/(float)iSensitivity;
-		if ((iPlanarCrossPosition.z+(float)dx/(float)iSensitivity>0.) && (iPlanarCrossPosition.z+(float)dx/(float)iSensitivity<1.))
-			iPlanarCrossPosition.y=iPlanarCrossPosition.y+(float)dx/(float)iSensitivity;
+		if ((iPlanarCrossPosition.y+(double)dy/(double)iSensitivity>0.) && (iPlanarCrossPosition.y+(double)dy/(double)iSensitivity<1.))
+			iPlanarCrossPosition.z=iPlanarCrossPosition.z+(double)dy/(double)iSensitivity;
+		if ((iPlanarCrossPosition.z+(double)dx/(double)iSensitivity>0.) && (iPlanarCrossPosition.z+(double)dx/(double)iSensitivity<1.))
+			iPlanarCrossPosition.y=iPlanarCrossPosition.y+(double)dx/(double)iSensitivity;
 	}
 	if(UserManipulatingSlice == SliceOrientation::y){
 		int dx = mouseAfterMovePositionX - iEventHistory->x();
 		int dy = iEventHistory->y() - mouseAfterMovePositionY;
-		if ((iPlanarCrossPosition.x+(float)dx/(float)iSensitivity>0.) && (iPlanarCrossPosition.x+(float)dx/(float)iSensitivity<1.))
-			iPlanarCrossPosition.x=iPlanarCrossPosition.x+(float)dx/(float)iSensitivity;
-		if ((iPlanarCrossPosition.z+(float)dy/(float)iSensitivity>0.) && (iPlanarCrossPosition.z+(float)dy/(float)iSensitivity<1.))
-			iPlanarCrossPosition.z=iPlanarCrossPosition.z+(float)dy/(float)iSensitivity;
+		if ((iPlanarCrossPosition.x+(double)dx/(double)iSensitivity>0.) && (iPlanarCrossPosition.x+(double)dx/(double)iSensitivity<1.))
+			iPlanarCrossPosition.x=iPlanarCrossPosition.x+(double)dx/(double)iSensitivity;
+		if ((iPlanarCrossPosition.z+(double)dy/(double)iSensitivity>0.) && (iPlanarCrossPosition.z+(double)dy/(double)iSensitivity<1.))
+			iPlanarCrossPosition.z=iPlanarCrossPosition.z+(double)dy/(double)iSensitivity;
 	}
-	CWidget::GetInstance()->updateGL();
+
+	iImage1->MoveToDepth(iPlanarCrossPosition.z);
+	iImage2->MoveToDepth(iPlanarCrossPosition.x);
+	iImage3->MoveToDepth(iPlanarCrossPosition.y);
+	CWidget::GetInstance()->paint();
 }
 
 void CPlanarWorkspace::mouseReleaseEvent(QMouseEvent *event){

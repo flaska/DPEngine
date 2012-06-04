@@ -38,6 +38,8 @@ void CWorkspaceExplorer::Scrolled(int value)
 	}
 } */
 
+
+
 CWorkspaceExplorer* CWorkspaceExplorer::InitInstance(CWidget *parent, QPointF& position, QPointF &size )
 {
 	if(!instance)
@@ -105,10 +107,10 @@ void CWorkspaceExplorer::SelectPlanarWorkspace()
 {
 	if(!CWidget::GetInstance())
 		return;
-//TODO	if(!CWorkspaceManager::GetInstance()->PlanarWorkspaceExists())
-//TODO		return;
+	if(!CWorkspaceManager::GetInstance()->PlanarWorkspaceExists())
+		return;
 	SelectWorkspace(NULL);
-	//CWidget::GetInstance()->updateGL();
+	CWidget::GetInstance()->paint();
 }
 
 void CWorkspaceExplorer::DrawSelection()
@@ -351,24 +353,24 @@ void CWorkspaceExplorer::AddNewWorkspace()
 	CWorkspaceManager::GetInstance()->AddWorkspace(newWorkspace);
 	SelectWorkspace(newWorkspace);
 	cwidget->paint();	
-}/*
-void CGLWorkspaceExplorer::CreateNewPlanarWorkspace()
+}
+void CWorkspaceExplorer::CreateNewPlanarWorkspace()
 {
-	if(!CWidget::GetIntance())
-		return;
+//	if(!CWidget::GetIntance())
+//		return;
 	CWidget* glwidget = CWidget::GetInstance();
-	try
+//	try
 	{
 		CPlanarWorkspace *newWorkspace = new CPlanarWorkspace(glwidget,glwidget->GetDefaultWorkspacePosition(),glwidget->GetDefaultWorkspaceSize());
 		CWorkspaceManager::GetInstance()->CreatePlanarWorkspace(newWorkspace);
 		//SelectWorkspace(NULL);
 		SelectPlanarWorkspace();
 	}
-	catch (TextureNotCreatedException &e)
+//	catch (TextureNotCreatedException &e)
 	{
 		//workspace not created
 	}
-}*/
+}
 void CWorkspaceExplorer::mouseDoubleClickEvent(QMouseEvent *event)
 {
 	AddNewWorkspace();

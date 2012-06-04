@@ -2,7 +2,7 @@
 #define CWORKSPACEMANGER_H_asdasd456
 #include <cimage.h>
 #include <cworkspace.h>
-//#include <glObjects/workspaces/glPlanarWorkspace.h>
+#include <cPlanarWorkspace.h>
 
 
 
@@ -27,19 +27,19 @@ private:
 public:
 	//void AddImageToActiveWorkspace(CGLImage *image);
 	CWorkspace *GetActiveWorkspace();
-	//CGLPlanarWorkspace *GetPlanarWorkspace();
+	CPlanarWorkspace *GetPlanarWorkspace();
 	void SetActiveWorkspace(CWorkspace *workspace);
 	//void AddWorkspace(CGLWorkspace *workspace);
-	//void CreatePlanarWorkspace(CGLPlanarWorkspace *workspace);
+	void CreatePlanarWorkspace(CPlanarWorkspace *workspace);
 	void RemoveWorkspace(CWorkspace*workspace);
 	QList<CWorkspace*> &GetWorkspaces();
-	//bool PlanarWorkspaceExists();
+	bool PlanarWorkspaceExists();
 	void AddWorkspace(CWorkspace *workspace);
 private:
 	CWorkspace *iActiveWorkspace;
 	QList<CWorkspace*> iWorkspaces;
 	static CObject *iParent;
 	//static CGLObject *iParent;
-	//CGLPlanarWorkspace *iPlanarWorkspace;
+	CPlanarWorkspace *iPlanarWorkspace;
 };
 #endif

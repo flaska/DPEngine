@@ -761,13 +761,13 @@ void CInfoPanel::CreateNewWorkspace()
 		CWorkspaceExplorer::GetInstance()->AddNewWorkspace();
 	}
 }
-/*
+
 void CInfoPanel::CreateNewPlanarWorkspace()
 {
 	if(!CWorkspaceExplorer::GetInstance())
 		return;
-//	if(!iSourceImage)
-//		return;
+	if(!iSourceImage)
+		return;
 	CWorkspaceExplorer::GetInstance()->CreateNewPlanarWorkspace();
 	CImage *image = iSourceImage;
 	if(!image)
@@ -775,7 +775,7 @@ void CInfoPanel::CreateNewPlanarWorkspace()
 //	CWorkspaceManager::GetInstance()->GetPlanarWorkspace()->UseImage(image);
 	//CWorkspaceManager::GetInstance()->GetActiveWorkspace()->UpdateTexture();
 }
-*/
+
 
 void CInfoPanel::OpenNewImage(){
 	if(MainWindow::iSelfS){

@@ -6,6 +6,13 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
+typedef struct
+{
+	float x;
+	float y;
+	float z;
+}TPlanarCrossPosition;
+
 typedef enum
 {
 	x,
@@ -17,7 +24,7 @@ class CWorkspaceSnapshot;
 
 class CPlanarWorkspace:public QWidget, public CObject
 {
-	Q_OBJECT
+	//Q_OBJECT
 public:
 	void SetGeometry(float x, float y, float width, float height);
 	void SetName( const QString &name);
@@ -26,7 +33,7 @@ public:
 	CPlanarWorkspace(CObject *parent, const QPointF &position, const QPointF &size);
 	~CPlanarWorkspace();
 	void initializeGL();
-	void paintGL();
+	void paint(QPainter*, QRect);
 	void DrawToTexture();
 	void DrawFromTexture();
 	void SaveSnapshot(QString& fileName);
@@ -50,7 +57,9 @@ public:
 private:
 	float iLastInnerHeight;
 	float iLastInnerWidth;
-
+	CImage *iImage1;
+	CImage *iImage2;
+	CImage *iImage3;
 	/**
 	* @Save the texture  to the file
 	* is performed when the actual texture is drawn

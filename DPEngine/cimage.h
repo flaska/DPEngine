@@ -72,7 +72,7 @@ public:
 	quint8* dicomrawdata8bitCopy;
 	quint8* dicomrawdata8bitCopy2;
 
-private:
+//private:
 	void MoveToDepth(float inDepthPosition);
 	QImage* iActualSliceCompleteImage;
 	QImage* iActualSliceCropImage;

@@ -8,7 +8,7 @@ CObject* CWorkspaceManager::iParent = NULL;
 CWorkspaceManager::CWorkspaceManager(/*CObject *parent*/)
 {
 	iActiveWorkspace = NULL;
-	//iPlanarWorkspace = NULL;
+	iPlanarWorkspace = NULL;
 }
 /*
 CWorkspaceManager::~CWorkspaceManager()
@@ -20,12 +20,12 @@ void CWorkspaceManager::AddImageToActiveWorkspace(CGLImage *image)
 {
 	iActiveWorkspace->AddImage(image);
 }
-
-CGLPlanarWorkspace *CWorkspaceManager::GetPlanarWorkspace()
+*/
+CPlanarWorkspace *CWorkspaceManager::GetPlanarWorkspace()
 {
 	return iPlanarWorkspace;
 }
-*/
+
 QList<CWorkspace*>& CWorkspaceManager::GetWorkspaces()
 {
 	return iWorkspaces;
@@ -99,9 +99,9 @@ void CWorkspaceManager::AddWorkspace(CWorkspace *workspace){
 		iActiveWorkspace = workspace;
 	}
 }
-/*
-void CWorkspaceManager::CreatePlanarWorkspace(CGLPlanarWorkspace *workspace){
-	if(!CGLWorkspaceExplorer::GetInstance())
+
+void CWorkspaceManager::CreatePlanarWorkspace(CPlanarWorkspace *workspace){
+	if(!CWorkspaceExplorer::GetInstance())
 	return;
 	iPlanarWorkspace = workspace;
 }
@@ -114,7 +114,7 @@ bool CWorkspaceManager::PlanarWorkspaceExists(){
 		return true;
 }
 
-*/
+
 CWorkspaceManager* CWorkspaceManager::GetInstance()
 {
 	return instance;
