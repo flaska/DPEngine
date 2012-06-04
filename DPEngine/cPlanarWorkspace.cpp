@@ -47,9 +47,9 @@ CObject(parent, position, size){
 	iImage1->SetGeometry(0, 0, iSize.x()/2, iSize.y()/2);
 	iImage2->SetGeometry(iSize.x()/2, 0, iSize.x()/2, iSize.y()/2);
 	iImage3->SetGeometry(0, iSize.y()/2, iSize.x()/2, iSize.y()/2);
-	iImage1->MoveToDepth(0.01);
-	iImage2->MoveToDepth(0.086105675);
-	iImage3->MoveToDepth(0.02);
+	iImage1->MoveToDepth(0.5);
+	iImage2->MoveToDepth(0.5);
+	iImage3->MoveToDepth(0.5);
 	CWidget::GetInstance()->paint();
 
 }
