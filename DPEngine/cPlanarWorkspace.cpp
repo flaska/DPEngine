@@ -151,10 +151,10 @@ void CPlanarWorkspace::paint(QPainter* painter, QRect position){
 	qpainter->drawLine(QPoint(0,iPlanarCrossPosition.y*iSize.y()/2),QPoint(iSize.x()/2,iPlanarCrossPosition.y*iSize.y()/2));
 
 	qpainter->drawLine(QPoint(iSize.x()/2+iPlanarCrossPosition.y*iSize.x()/2,0),QPoint(iSize.x()/2+iPlanarCrossPosition.y*iSize.x()/2,iSize.y()/2));//iPlanarCrossPosition.x*iSize.x()/2,
-	qpainter->drawLine(QPoint(iSize.x()/2,iPlanarCrossPosition.y*iSize.y()/2),QPoint(iSize.x(),iPlanarCrossPosition.y*iSize.y()/2));
+	qpainter->drawLine(QPoint(iSize.x()/2,iPlanarCrossPosition.z*iSize.y()/2),QPoint(iSize.x(),iPlanarCrossPosition.z*iSize.y()/2));
 
 	qpainter->drawLine(QPoint(iPlanarCrossPosition.x*iSize.x()/2,iSize.y()/2),QPoint(iPlanarCrossPosition.x*iSize.x()/2,iSize.y()));//iPlanarCrossPosition.x*iSize.x()/2,
-	qpainter->drawLine(QPoint(0,iSize.y()/2+iPlanarCrossPosition.y*iSize.y()/2),QPoint(iSize.x()/2,iSize.y()/2+iPlanarCrossPosition.y*iSize.y()/2));
+	qpainter->drawLine(QPoint(0,iSize.y()/2+iPlanarCrossPosition.z*iSize.y()/2),QPoint(iSize.x()/2,iSize.y()/2+iPlanarCrossPosition.z*iSize.y()/2));
 
 	//qpainter->drawLine(QPoint(x,x),QPoint(x,x));
 	qpainter->end();
@@ -286,16 +286,16 @@ void CPlanarWorkspace::mouseMoveEvent(QMouseEvent *event){
 			iPlanarCrossPosition.y=iPlanarCrossPosition.y+(double)dy/(double)iSensitivity;
 	}
 	if(UserManipulatingSlice == SliceOrientation::x){
-		int dx = iEventHistory->x() - mouseAfterMovePositionX;
-		int dy = iEventHistory->y() - mouseAfterMovePositionY;
-		if ((iPlanarCrossPosition.y+(double)dy/(double)iSensitivity>0.) && (iPlanarCrossPosition.y+(double)dy/(double)iSensitivity<1.))
+		int dx = - iEventHistory->x() + mouseAfterMovePositionX;
+		int dy = - iEventHistory->y() + mouseAfterMovePositionY;
+		if ((iPlanarCrossPosition.z+(double)dy/(double)iSensitivity>0.) && (iPlanarCrossPosition.z+(double)dy/(double)iSensitivity<1.))
 			iPlanarCrossPosition.z=iPlanarCrossPosition.z+(double)dy/(double)iSensitivity;
-		if ((iPlanarCrossPosition.z+(double)dx/(double)iSensitivity>0.) && (iPlanarCrossPosition.z+(double)dx/(double)iSensitivity<1.))
+		if ((iPlanarCrossPosition.y+(double)dx/(double)iSensitivity>0.) && (iPlanarCrossPosition.y+(double)dx/(double)iSensitivity<1.))
 			iPlanarCrossPosition.y=iPlanarCrossPosition.y+(double)dx/(double)iSensitivity;
 	}
 	if(UserManipulatingSlice == SliceOrientation::y){
 		int dx = mouseAfterMovePositionX - iEventHistory->x();
-		int dy = iEventHistory->y() - mouseAfterMovePositionY;
+		int dy = - iEventHistory->y() + mouseAfterMovePositionY;
 		if ((iPlanarCrossPosition.x+(double)dx/(double)iSensitivity>0.) && (iPlanarCrossPosition.x+(double)dx/(double)iSensitivity<1.))
 			iPlanarCrossPosition.x=iPlanarCrossPosition.x+(double)dx/(double)iSensitivity;
 		if ((iPlanarCrossPosition.z+(double)dy/(double)iSensitivity>0.) && (iPlanarCrossPosition.z+(double)dy/(double)iSensitivity<1.))
