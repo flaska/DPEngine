@@ -72,9 +72,14 @@ public:
 	quint8* iImageTextureCoronal;
 	quint8* iImageTextureSaggital;
 	quint8* iImageTextureAxial;
+	quint8* iImageTextureAxialInterpolated;
 	quint8* iImageTextureSaggitalInterpolated;
 	quint8* iImageTextureCoronalInterpolated;
 	int iInterpolation;
+	int GetRealDepth();
+	int iDepthRatio;
+	void PrepareImageData();
+
 
 //private:
 	void MoveToDepth(float inDepthPosition);

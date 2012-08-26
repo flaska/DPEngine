@@ -144,7 +144,6 @@ void CPlanarWorkspace::SetSaveSnapshotHeight(int height)
 
 
 void CPlanarWorkspace::paint(QPainter* painter, QRect position){
-
 	QPixmap* outputpixmap = new QPixmap(iSize.x(),iSize.y());
 	outputpixmap->fill(Qt::black);
 	QPainter *qpainter = new QPainter();
@@ -152,15 +151,12 @@ void CPlanarWorkspace::paint(QPainter* painter, QRect position){
 	iImage1->paint(qpainter);
 	iImage2->paint(qpainter);
 	iImage3->paint(qpainter);
-	qpainter->drawLine(QPoint(iPlanarCrossPosition.x*iSize.x()/2,0),QPoint(iPlanarCrossPosition.x*iSize.x()/2,iSize.y()/2));//iPlanarCrossPosition.x*iSize.x()/2,
+	qpainter->drawLine(QPoint(iPlanarCrossPosition.x*iSize.x()/2,0),QPoint(iPlanarCrossPosition.x*iSize.x()/2,iSize.y()/2));
 	qpainter->drawLine(QPoint(0,iPlanarCrossPosition.y*iSize.y()/2),QPoint(iSize.x()/2,iPlanarCrossPosition.y*iSize.y()/2));
 
-
-	/* *** */
-	//iPlanarCrossPosition.z
 	float textureWidth = (float)iImage1->GetTexture()->GetWidth();
-	float textureDepth = (float)iImage1->GetTexture()->GetDepth();
-	float ratio = textureDepth*8/textureWidth;
+	float textureDepth = (float)iImage1->GetRealDepth();
+	float ratio = textureDepth/textureWidth;
 
 	QPointF leftTop = iImage2->GetPosition();
 	QPointF rightBottom = QPointF(iImage2->GetPosition().x()+iImage2->GetSize().x(),iImage2->GetPosition().y()+iImage2->GetSize().y());
@@ -168,22 +164,24 @@ void CPlanarWorkspace::paint(QPainter* painter, QRect position){
 	int realHeight =(int)(ratio*(float)iImage2->GetSize().x());
 	int realLeftTop = (iImage2->GetSize().y()-realHeight)/2;
 
-	qpainter->drawLine(QPoint(iSize.x()/2+iPlanarCrossPosition.y*iSize.x()/2,0),QPoint(iSize.x()/2+iPlanarCrossPosition.y*iSize.x()/2,iSize.y()/2));//iPlanarCrossPosition.x*iSize.x()/2,
+	qpainter->drawLine(QPoint(iSize.x()/2+iPlanarCrossPosition.y*iSize.x()/2,0),QPoint(iSize.x()/2+iPlanarCrossPosition.y*iSize.x()/2,iSize.y()/2));
 	qpainter->drawLine(QPoint(iSize.x()/2,realLeftTop+iPlanarCrossPosition.z*realHeight),QPoint(iSize.x(),realLeftTop+iPlanarCrossPosition.z*realHeight));
-	/* *** */
 
-	qpainter->drawLine(QPoint(iPlanarCrossPosition.x*iSize.x()/2,iSize.y()/2),QPoint(iPlanarCrossPosition.x*iSize.x()/2,iSize.y()));//iPlanarCrossPosition.x*iSize.x()/2,
-	qpainter->drawLine(QPoint(0,iSize.y()/2+iPlanarCrossPosition.z*iSize.y()/2),QPoint(iSize.x()/2,iSize.y()/2+iPlanarCrossPosition.z*iSize.y()/2));
 
-	//qpainter->drawLine(QPoint(x,x),QPoint(x,x));
+	leftTop = iImage3->GetPosition();
+	rightBottom = QPointF(iImage3->GetPosition().x()+iImage3->GetSize().x(),iImage3->GetPosition().y()+iImage3->GetSize().y());
+
+	realHeight =(int)(ratio*(float)iImage3->GetSize().x());
+	realLeftTop = iImage3->GetPosition().y()+(iImage3->GetSize().y()-realHeight)/2;
+	qpainter->drawLine(QPoint(iPlanarCrossPosition.x*iSize.x()/2,iSize.y()/2),QPoint(iPlanarCrossPosition.x*iSize.x()/2,iSize.y()));
+	qpainter->drawLine(QPoint(0,realLeftTop+iPlanarCrossPosition.z*realHeight),QPoint(iSize.x()/2,realLeftTop+iPlanarCrossPosition.z*realHeight));
+
 	qpainter->end();
 	delete qpainter;
 
 	painter->drawPixmap(position,*outputpixmap);
 	DrawBorderRect(painter);
-	delete outputpixmap;
-	
-	
+	delete outputpixmap;	
 }
 
 void CPlanarWorkspace::DrawBorders(){/*
