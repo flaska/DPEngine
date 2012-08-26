@@ -75,7 +75,6 @@ CDicom3DTexture *C3DTextureManager::LoadTexture(QString &fileName)
 	{
 		
 		CDicom3DTexture *texture= new CDicom3DTexture (fileName);
-		
 		texture->SetIdentificationString (seriesUIDstr);
 		iHandleCounts[seriesUIDstr]++;
 		iTextures[seriesUIDstr]= texture;	

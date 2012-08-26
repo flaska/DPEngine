@@ -20,12 +20,12 @@ CObject(parent, position, size){
 	iSaveSnapshotFileName = NULL;
 	QString name;
 	name.clear();
-	name.append("MPS");
+	name.append("MPR");
 	//name.append(QString::number(CWorkspaceManager::GetInstance()->GetWorkspaces().count()));
 	SetName(name);
 	iImage = NULL;
 	//SetLayout(layoutType);
-	iWorkspaceSnapshot =new CWorkspaceSnapshot(parent,(CWorkspace*)this,QPointF(10,10), QPointF(100,100));
+	iWorkspaceSnapshot =new CWorkspaceSnapshot(parent,(CWorkspace*)this,QPointF(400,400), QPointF(100,100));
 	SetBorders(Settings::GetBordersConstant(EWorkspaceBorders));
 	SetBorderColor(Settings::GetColorConstant(EWorkspaceBorderColor));
 	SetInnerColor(Settings::GetColorConstant(EWorkspaceInnerColor));
@@ -47,18 +47,23 @@ CObject(parent, position, size){
 	iImage1->SetGeometry(0, 0, iSize.x()/2, iSize.y()/2);
 	iImage2->SetGeometry(iSize.x()/2, 0, iSize.x()/2, iSize.y()/2);
 	iImage3->SetGeometry(0, iSize.y()/2, iSize.x()/2, iSize.y()/2);
+	float textureWidth = (float)iImage1->GetTexture()->GetWidth();
+	int textureHeight = iImage1->GetTexture()->GetHeight();
+	int textureDepth = iImage1->GetTexture()->GetDepth();
+	float zoom = iImage1->GetSize().x()/textureWidth;
+	iImage1->SetZoom(zoom);
+	iImage2->SetZoom(zoom);
+	iImage3->SetZoom(zoom);
 	iImage1->MoveToDepth(0.5);
 	iImage2->MoveToDepth(0.5);
 	iImage3->MoveToDepth(0.5);
 	CWidget::GetInstance()->paint();
-
 }
 
 
 void CPlanarWorkspace::SetGeometry(float x, float y, float w, float h){
 	QPointF oldPos = iPosition;
 	if(iLastInnerHeight ==0){
-
 		iLastInnerWidth = iSize.x()-GetBorders().left-GetBorders().right;
 		iLastInnerHeight = iSize.y()-GetBorders().top-GetBorders().bottom;
 	}
@@ -150,8 +155,22 @@ void CPlanarWorkspace::paint(QPainter* painter, QRect position){
 	qpainter->drawLine(QPoint(iPlanarCrossPosition.x*iSize.x()/2,0),QPoint(iPlanarCrossPosition.x*iSize.x()/2,iSize.y()/2));//iPlanarCrossPosition.x*iSize.x()/2,
 	qpainter->drawLine(QPoint(0,iPlanarCrossPosition.y*iSize.y()/2),QPoint(iSize.x()/2,iPlanarCrossPosition.y*iSize.y()/2));
 
+
+	/* *** */
+	//iPlanarCrossPosition.z
+	float textureWidth = (float)iImage1->GetTexture()->GetWidth();
+	float textureDepth = (float)iImage1->GetTexture()->GetDepth();
+	float ratio = textureDepth*8/textureWidth;
+
+	QPointF leftTop = iImage2->GetPosition();
+	QPointF rightBottom = QPointF(iImage2->GetPosition().x()+iImage2->GetSize().x(),iImage2->GetPosition().y()+iImage2->GetSize().y());
+
+	int realHeight =(int)(ratio*(float)iImage2->GetSize().x());
+	int realLeftTop = (iImage2->GetSize().y()-realHeight)/2;
+
 	qpainter->drawLine(QPoint(iSize.x()/2+iPlanarCrossPosition.y*iSize.x()/2,0),QPoint(iSize.x()/2+iPlanarCrossPosition.y*iSize.x()/2,iSize.y()/2));//iPlanarCrossPosition.x*iSize.x()/2,
-	qpainter->drawLine(QPoint(iSize.x()/2,iPlanarCrossPosition.z*iSize.y()/2),QPoint(iSize.x(),iPlanarCrossPosition.z*iSize.y()/2));
+	qpainter->drawLine(QPoint(iSize.x()/2,realLeftTop+iPlanarCrossPosition.z*realHeight),QPoint(iSize.x(),realLeftTop+iPlanarCrossPosition.z*realHeight));
+	/* *** */
 
 	qpainter->drawLine(QPoint(iPlanarCrossPosition.x*iSize.x()/2,iSize.y()/2),QPoint(iPlanarCrossPosition.x*iSize.x()/2,iSize.y()));//iPlanarCrossPosition.x*iSize.x()/2,
 	qpainter->drawLine(QPoint(0,iSize.y()/2+iPlanarCrossPosition.z*iSize.y()/2),QPoint(iSize.x()/2,iSize.y()/2+iPlanarCrossPosition.z*iSize.y()/2));
@@ -165,41 +184,6 @@ void CPlanarWorkspace::paint(QPainter* painter, QRect position){
 	delete outputpixmap;
 	
 	
-	/*
-	if(!iImage){
-		glEnable(GL_BLEND);
-		return;
-	}
-	iImage->PreparePlanarSlice('z',iPlanarCrossPosition);
-	iImage->PreparePlanarSlice('x',iPlanarCrossPosition);
-	iImage->PreparePlanarSlice('y',iPlanarCrossPosition);
-
-	CWidget::GetInstance()->resetGLView();
-	//Translate();
-	DrawBorderRect();	
-	DrawInnerRect();
-	int ypos= CWidget::GetInstance()->GetSize().y()
-		-iSize.y()
-		-iPosition.y()+GetBorders().bottom;
-	glViewport(iPosition.x()+GetBorders().left,
-		ypos ,
-		iSize.x()-GetBorders().left-GetBorders().right
-		, iSize.y()-GetBorders().top-GetBorders().bottom);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, 1 , 0,1, 0.1, 90); 
-	glMatrixMode(GL_MODELVIEW); 
-	glLoadIdentity();				
-	glTranslatef(0,0,-50);
-	glDisable(GL_BLEND);
-
-	iImage->DrawSliceZ();
-	iImage->DrawSliceX();
-	iImage->DrawSliceY();
-
-	DrawBorders();
-
-	glEnable(GL_BLEND);*/
 }
 
 void CPlanarWorkspace::DrawBorders(){/*
@@ -288,8 +272,9 @@ void CPlanarWorkspace::mouseMoveEvent(QMouseEvent *event){
 	if(UserManipulatingSlice == SliceOrientation::x){
 		int dx = - iEventHistory->x() + mouseAfterMovePositionX;
 		int dy = - iEventHistory->y() + mouseAfterMovePositionY;
-		if ((iPlanarCrossPosition.z+(double)dy/(double)iSensitivity>0.) && (iPlanarCrossPosition.z+(double)dy/(double)iSensitivity<1.))
-			iPlanarCrossPosition.z=iPlanarCrossPosition.z+(double)dy/(double)iSensitivity;
+		float newPos = iPlanarCrossPosition.z+(double)dy/(double)iSensitivity;
+		if ((newPos>0.) && (newPos<1.))
+			iPlanarCrossPosition.z=newPos;
 		if ((iPlanarCrossPosition.y+(double)dx/(double)iSensitivity>0.) && (iPlanarCrossPosition.y+(double)dx/(double)iSensitivity<1.))
 			iPlanarCrossPosition.y=iPlanarCrossPosition.y+(double)dx/(double)iSensitivity;
 	}

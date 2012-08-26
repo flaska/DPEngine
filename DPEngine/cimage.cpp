@@ -39,10 +39,10 @@ CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &
 	iTexture = NULL;
 	iTexture= C3DTextureManager::GetInstance()->LoadTexture(file);
 	try{
-		dicomrawdata8bitCopy=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount];
-		dicomrawdata8bitCopy2=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount*2];
+		iImageTextureSaggital=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount];
+		iImageTextureCoronal=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount];
 	}
-	catch (std::bad_alloc){
+	catch (std::bad_alloc&){
 		std::cout << "out of memory" << std::endl;
 		std::exit(0);
 	}
@@ -59,11 +59,49 @@ CImage::CImage(CObject *parentWindow,QString &file, QPointF& position, QPointF &
 	}*/
 	iImageWindow.center=int((iImageWindow.center )/CDicomFrames::iWindowMultiplyFactor);
 	iImageWindow.width=int((iImageWindow.width )/CDicomFrames::iWindowMultiplyFactor);
+
+	iImageTextureAxial = (quint8*)iTexture->iFrames->GetImageData();
+	int width = iTexture->iFrames->GetImagesInfo().width;
+	int height = iTexture->iFrames->GetImagesInfo().height;
+	int frameints = iTexture->iFrames->GetImagesInfo().frameQuintsCount;
+	int framescount = iTexture->iFrames->GetImagesInfo().framesCount;
+	int j=0;
+	for (int slice=0; slice<height; slice++)
+		for (int frame=0; frame<framescount; frame++){
+			int framestart = frame*frameints;
+			for (int y=0; y<width; y++){	
+				iImageTextureSaggital[j]=iImageTextureAxial[framestart+slice+y*width];
+				j++;
+			}
+		}
+	int i=0;
+	for (int slice=0; slice<height; slice++)
+		for (int frame=0; frame<framescount; frame++){
+			int start = width*slice + frame*frameints;
+			for (int x=0; x<width; x++){				
+				iImageTextureCoronal[i]=iImageTextureAxial[x+start];
+				i++;
+			}
+		}
+	/*
+	try{
+		iImageTextureSaggitalInterpolated=new quint8[iTexture->iFrames->GetImagesInfo().height*iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount*2];
+		iImageTextureCoronalInterpolated=new quint8[iTexture->iFrames->GetImagesInfo().height*iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount*2];
+	} catch (std::bad_alloc&){
+		std::cout << "out of memory" << std::endl;
+		std::exit(0);
+	}
+	for (int y=0; y<height; y++) {
+		for (int x=0; x<width; x++){
+			quint8 val = iImageTextureSaggital[width*y+x];
+			iImageTextureSaggitalInterpolated[width*y+x]=val;
+		}	
+	}*/
 	PrepareSlice();
 }
 
 CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position, QPointF &size ):CObject(parentWindow,position,size)
-{	
+{		//myLabel = new QLabel(); //debug
 	iImageAxisOrientation = EImageOrientationAxial;
 	iActualSliceCompleteImage = NULL;
 	iActualSliceCropImage = NULL;
@@ -74,10 +112,10 @@ CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position
 	}
 	iTexture= texture;
 	try{
-		dicomrawdata8bitCopy=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount];
-		dicomrawdata8bitCopy2=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount*2];
+		iImageTextureSaggital=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount];
+		iImageTextureCoronal=new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount];
 	}
-	catch (std::bad_alloc){
+	catch (std::bad_alloc&){
 		std::cout << "out of memory" << std::endl;
 		std::exit(0);
 	}
@@ -101,101 +139,105 @@ CImage::CImage(CObject *parentWindow,CDicom3DTexture *texture, QPointF& position
 	iFrameSlider.size.setX(iSize.x() - iFrameSlider.position.x() - 25); //iSize.x() - size.x()
 	iFrameSlider.position.setY(iSize.y() - iFrameSlider.size.y()-2);
 	iFrameSlider.data=0;
+	iImageTextureAxial = (quint8*)iTexture->iFrames->GetImageData();
+	int width = iTexture->iFrames->GetImagesInfo().width;
+	int height = iTexture->iFrames->GetImagesInfo().height;
+	int frameints = iTexture->iFrames->GetImagesInfo().frameQuintsCount;
+	int framescount = iTexture->iFrames->GetImagesInfo().framesCount;
+	int j=0;
+	for (int slice=0; slice<height; slice++)
+		for (int frame=0; frame<framescount; frame++){
+			int framestart = frame*frameints;
+			for (int y=0; y<width; y++){	
+				iImageTextureSaggital[j]=iImageTextureAxial[framestart+slice+y*width];
+				j++;
+			}
+		}
+	int i=0;
+	for (int slice=0; slice<height; slice++)
+		for (int frame=0; frame<framescount; frame++){
+			int start = width*slice + frame*frameints;
+			for (int x=0; x<width; x++){				
+				iImageTextureCoronal[i]=iImageTextureAxial[x+start];
+				i++;
+			}
+		}
+	iInterpolation = 2;
+	try{
+		iImageTextureSaggitalInterpolated=new quint8[iTexture->iFrames->GetImagesInfo().height*iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount*iInterpolation];
+		iImageTextureCoronalInterpolated=new quint8[iTexture->iFrames->GetImagesInfo().height*iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().framesCount*iInterpolation];
+	} catch (std::bad_alloc&){
+		std::cout << "out of memory" << std::endl;
+		std::exit(0);
+	}
+	for (int slice=0; slice<height; slice++)
+		for (int frame=0; frame<framescount; frame++){
+			int start = width*slice + frame*frameints;
+			for (int x=0; x<width; x++){		
+				quint8 pixVal = iImageTextureSaggital[slice*(framescount*width)+frame*width+x];
+				iImageTextureSaggitalInterpolated[slice*(framescount*width)*iInterpolation+frame*width*iInterpolation+x]=pixVal;
+				quint8 nextLinePixVal = iImageTextureSaggital[slice*(framescount*width)+(frame+1)*width+x];
+				quint8 interpolatedVal = (pixVal+nextLinePixVal)/2;
+				iImageTextureSaggitalInterpolated[slice*(framescount*width)*iInterpolation+frame*width*iInterpolation+x+width]=interpolatedVal;
+			}
+		}
 
-
+	for (int slice=0; slice<height; slice++)
+		for (int frame=0; frame<framescount; frame++){
+			int start = width*slice + frame*frameints;
+			for (int x=0; x<width; x++){		
+				quint8 pixVal = iImageTextureCoronal[slice*(framescount*width)+frame*width+x];
+				iImageTextureCoronalInterpolated[slice*(framescount*width)*iInterpolation+frame*width*iInterpolation+x]=pixVal;
+				quint8 nextLinePixVal = iImageTextureCoronal[slice*(framescount*width)+(frame+1)*width+x];
+				quint8 interpolatedVal = (pixVal+nextLinePixVal)/2;
+				iImageTextureCoronalInterpolated[slice*(framescount*width)*iInterpolation+frame*width*iInterpolation+x+width]=interpolatedVal;
+			}
+		}
 	PrepareSlice();
 }
 
 
-void CImage::PrepareSlice(){
-	quint8* dicomrawdata8bit = (quint8*)iTexture->iFrames->GetImageData();
-	uchar * dicomrawdata16bit;
-	//if (dicomrawdata8bitCopy!=NULL) 
-	//delete[] dicomrawdata8bitCopy;
 
+void CImage::PrepareSlice(){
+	QImage img;
 	int dicomrawdatawidth = iTexture->iFrames->GetWidth();
 	int dicomrawdataheight = iTexture->iFrames->GetHeight();
 	int dicomrawdatabytesperline = iTexture->iFrames->GetWidth();
-
+	int framescount = iTexture->iFrames->GetImagesInfo().framesCount;
 	if (GetOrientation()==EImageOrientationAxial){
 		int y = 20*iActualTextureCoords.bottomLeft.GetZ();
-		dicomrawdata8bit = dicomrawdata8bit+(iTexture->iFrames->GetImagesInfo().frameQuintsCount*y) ;
-		dicomrawdata16bit = (uchar*)dicomrawdata8bit;
+		if (y<0) y=0;
+		if (y>=framescount) y=framescount-1;
+		uchar * dicomrawdata16bit;
+		dicomrawdata16bit = (uchar*)(iImageTextureAxial+(iTexture->iFrames->GetImagesInfo().frameQuintsCount*y));
+		img = QImage(dicomrawdata16bit, dicomrawdatawidth, dicomrawdataheight, dicomrawdatabytesperline, QImage::Format_Indexed8);
+		img = img.convertToFormat(QImage::Format_RGB32);
 	}
+
 	if (GetOrientation()==EImageOrientationSagittal){
 		int width = iTexture->iFrames->GetImagesInfo().width;
-		int shift = width*iActualTextureCoords.bottomLeft.GetX();
-		if (shift>width) shift = width;
-		int frameints = iTexture->iFrames->GetImagesInfo().frameQuintsCount;
-		int i=0;		
-		for (int f=0; f<iTexture->iFrames->GetImagesInfo().framesCount; f++){
-			int start = f*frameints;
-			for (int y=0; y<iTexture->iFrames->GetImagesInfo().height; y++){
-				dicomrawdata8bitCopy[i]=dicomrawdata8bit[y*width+start+shift];
-				i++;
-			}
-		}
-		dicomrawdataheight = iTexture->iFrames->GetImagesInfo().framesCount;
-		dicomrawdata16bit = (uchar*)dicomrawdata8bitCopy;
-
-		for (int y=0;y<dicomrawdataheight;y++){
-			for (int x=0;x<width;x++){
-				dicomrawdata8bitCopy2[x+2*y*width]=dicomrawdata8bitCopy[x+y*width];
-			}
-			for (int x=0;x<width;x++){
-				dicomrawdata8bitCopy2[x+(2*y+1)*width]=(dicomrawdata8bitCopy[x+y*width]+dicomrawdata8bitCopy[x+(y+1)*width])/2;
-			}
-		}
-		dicomrawdataheight=2*dicomrawdataheight-2;
-		dicomrawdata16bit=dicomrawdata8bitCopy2;
+		float x = (float)iActualTextureCoords.bottomLeft.GetX();
+		int position = x*width;
+		if (position>=512) position=511;
+		quint8* shift = iImageTextureSaggitalInterpolated + (width*(22)*position*iInterpolation);
+		uchar * dicomrawdata16bit;
+		dicomrawdata16bit = (uchar*)shift;
+		img = QImage(dicomrawdata16bit, dicomrawdatawidth, framescount*iInterpolation, dicomrawdatabytesperline, QImage::Format_Indexed8);
+		img = img.convertToFormat(QImage::Format_RGB32);
 	}
+
 	if (GetOrientation()==EImageOrientationCoronal){
 		int width = iTexture->iFrames->GetImagesInfo().width;
-		int z = width*iActualTextureCoords.bottomLeft.GetY();
-		
-		//dicomrawdata8bitCopy = new quint8[iTexture->iFrames->GetImagesInfo().width*iTexture->iFrames->GetImagesInfo().frameQuintsCount];
-		int frameints = iTexture->iFrames->GetImagesInfo().frameQuintsCount;
-		int i=0;
-		int line = (int)(width*iActualTextureCoords.bottomLeft.GetY());
-		if (line>width) line = width;
-		for (int f=0; f<iTexture->iFrames->GetImagesInfo().framesCount; f++){
-			int start = f*frameints+line*iTexture->iFrames->GetImagesInfo().width;
-			for (int x=0; x<iTexture->iFrames->GetImagesInfo().width; x++){				
-				dicomrawdata8bitCopy[i]=dicomrawdata8bit[x+start];
-				i++;
-			}
-		}
-		dicomrawdataheight = iTexture->iFrames->GetImagesInfo().framesCount;
-		dicomrawdata16bit = (uchar*)dicomrawdata8bitCopy;
-
-		for (int y=0;y<dicomrawdataheight;y++){
-			for (int x=0;x<width;x++){
-				dicomrawdata8bitCopy2[x+2*y*width]=dicomrawdata8bitCopy[x+y*width];
-			}
-			for (int x=0;x<width;x++){
-				dicomrawdata8bitCopy2[x+(2*y+1)*width]=(dicomrawdata8bitCopy[x+y*width]+dicomrawdata8bitCopy[x+(y+1)*width])/2;
-			}
-		}
-		dicomrawdataheight=2*dicomrawdataheight-2;
-		dicomrawdata16bit=dicomrawdata8bitCopy2;
-
+		float y = (float)iActualTextureCoords.bottomLeft.GetY();
+		int position = y*width;
+		if (position>=512) position=511;
+		std::cout << "y: " << y << std::endl;
+		quint8* shift = iImageTextureCoronalInterpolated + (width*(22)*position*iInterpolation);
+		uchar * dicomrawdata16bit;
+		dicomrawdata16bit = (uchar*)shift;
+		img = QImage(dicomrawdata16bit, dicomrawdatawidth, framescount*iInterpolation, dicomrawdatabytesperline, QImage::Format_Indexed8);
+		img = img.convertToFormat(QImage::Format_RGB32);
 	}
-	
-	QImage img = QImage(dicomrawdata16bit, dicomrawdatawidth, dicomrawdataheight, dicomrawdatabytesperline, QImage::Format_Indexed8);
-	img = img.convertToFormat(QImage::Format_RGB32);
-	if (img.isNull()) return;
-	float bias = iBias*255.0;
-	for (int y=0; y<dicomrawdataheight; y++){
-		QRgb* imageLine=(QRgb*)img.scanLine(y);
-		for (int x=0; x<dicomrawdatawidth; x++) {
-			float originalintensity = (float)qRed(imageLine[x]);
-			int newintensity = (int)(originalintensity*iScale+bias);
-			if(newintensity>254) newintensity=254;
-			if(newintensity<1) newintensity=1;
-			imageLine[x]=qRgb(newintensity,newintensity,newintensity);
-		}
-	}
-
 
 	if (iActualSliceCompleteImage)
 		delete iActualSliceCompleteImage;
@@ -203,32 +245,28 @@ void CImage::PrepareSlice(){
 }
 
 void CImage::PrepareImageCrop(){
-	if (CWorkspaceManager::GetInstance()->GetPlanarWorkspace())
-	{
-		if (iActualSliceCropImage)
-			delete iActualSliceCropImage;
-		iActualSliceCropImage = new QImage(getCompleteImage()->copy());
-		return;
-	}
-
 	int width=iSize.x()-GetBorders().right-GetBorders().left;
 	int height=iSize.y()-GetBorders().bottom-GetBorders().top;
-	if (this->GetOrientation()==EImageOrientationCoronal || this->GetOrientation()==EImageOrientationSagittal) height=iSize.y()*2-GetBorders().bottom-GetBorders().top;
+	int textureHeight;
+	if (this->GetOrientation()==EImageOrientationAxial) textureHeight = (float)iTexture->GetHeight();
+	if (this->GetOrientation()==EImageOrientationSagittal) textureHeight = (float)iTexture->GetDepth()*8;
+	if (this->GetOrientation()==EImageOrientationCoronal) textureHeight = (float)iTexture->GetDepth()*8/**4*/;
+
 	int xcenter = iImageCenter.x()*width;
 	int ycenter = iImageCenter.y()*height;
 	float xgapbefore = (xcenter - (((float)iTexture->GetWidth()/2)*iZoomFactor));
-	float ygapbefore = (ycenter - (((float)iTexture->GetHeight()/2)*iZoomFactor));
+	float ygapbefore = (ycenter - ((textureHeight/2)*iZoomFactor));
 
 	float xgapafter = (((float)iTexture->GetWidth()/2)*iZoomFactor)-(width-xcenter);
-	float ygapafter = (((float)iTexture->GetHeight()/2)*iZoomFactor)-(height-ycenter);
+	float ygapafter = ((textureHeight/2)*iZoomFactor)-(height-ycenter);
 
 	QPointF leftTopScaled (
 		-xgapbefore/(iTexture->GetWidth() * iZoomFactor),
-		-ygapbefore/(iTexture->GetHeight() * iZoomFactor)
+		-ygapbefore/(textureHeight * iZoomFactor)
 	);
 	QPointF rightBottomScaled (
 		1.- (xgapafter/(iTexture->GetWidth()*iZoomFactor)),
-		1.- (ygapafter/(iTexture->GetHeight()*iZoomFactor))
+		1.- (ygapafter/(textureHeight*iZoomFactor))
 	);
 	QPoint leftTopReal (
 		leftTopScaled.x()*iActualSliceCompleteImage->width(),

@@ -71,6 +71,7 @@ CWorkspaceExplorer* CWorkspaceExplorer::GetInstance()
 
 CWorkspaceExplorer::CWorkspaceExplorer(CWidget *parentWindow, QPointF& position, QPointF &size ):CObject (parentWindow, position, size)
 {	
+	iPlanarWorkspace = NULL;
 	iScrollBar = new QScrollBar(Qt::Horizontal,parentWindow);
 	iScrollBar->setMinimum(0);
 	iScrollBar->setMaximum(0);
@@ -221,6 +222,12 @@ void CWorkspaceExplorer::paint(QPainter* painter)
 			snap.paint(painter);
 		}
 	}
+	if (iPlanarWorkspace){
+		CWorkspaceSnapshot &snap = iPlanarWorkspace->GetSnapshot();
+		snapWidthSum += snap.GetSize().x();
+		snap.paintMPR(painter);
+	}
+		
 	//CGLWidget::GetInstance()->resetGLView();
 	//DrawSelection(painter);
 	
@@ -299,6 +306,11 @@ void CWorkspaceExplorer::SetGeometry(int x, int y, int width, int height)
 		posx+=size.x();
 
 	}
+	if (iPlanarWorkspace!=NULL){
+		QPoint size=GetDefaultWorkspaceSnapshotSize();
+		QPoint pos = GetDefaultWorkspaceSnapshotPos();
+		iPlanarWorkspace->GetSnapshot().SetGeometry(posx,pos.y(), size.x(),size.y());
+	}
 }
 
 void CWorkspaceExplorer::wheelEvent(QWheelEvent *event)
@@ -361,15 +373,22 @@ void CWorkspaceExplorer::CreateNewPlanarWorkspace()
 	CWidget* glwidget = CWidget::GetInstance();
 //	try
 	{
-		CPlanarWorkspace *newWorkspace = new CPlanarWorkspace(glwidget,glwidget->GetDefaultWorkspacePosition(),glwidget->GetDefaultWorkspaceSize());
-		CWorkspaceManager::GetInstance()->CreatePlanarWorkspace(newWorkspace);
+		iPlanarWorkspace = new CPlanarWorkspace(glwidget,glwidget->GetDefaultWorkspacePosition(),glwidget->GetDefaultWorkspaceSize());
+		CWorkspaceManager::GetInstance()->CreatePlanarWorkspace(iPlanarWorkspace);
 		//SelectWorkspace(NULL);
 		SelectPlanarWorkspace();
+		
+		CWidget::GetInstance()->paint();
 	}
 //	catch (TextureNotCreatedException &e)
 	{
 		//workspace not created
 	}
+	
+	QPoint workspaceExplorerPos(0,CWidget::GetInstance()->height()-Settings::imageExplorerSize);
+	QPoint workspaceExplorerSize(CWidget::GetInstance()->width(),CWidget::GetInstance()->height()-workspaceExplorerPos.y());
+	SetGeometry(workspaceExplorerPos.x(),workspaceExplorerPos.y(),workspaceExplorerSize.x(),workspaceExplorerSize.y());
+	CWidget::GetInstance()->paint();
 }
 void CWorkspaceExplorer::mouseDoubleClickEvent(QMouseEvent *event)
 {
@@ -464,5 +483,10 @@ void CWorkspaceExplorer::mousePressEvent(QMouseEvent *event)
 			return;
 		}
 	}
-	
+	if (iPlanarWorkspace){
+		if (iPlanarWorkspace->GetSnapshot().IsPointOnObject(event->x(),event->y())){
+			iPlanarWorkspace->GetSnapshot().mousePressEventMPR(event);
+			return;
+		}
+	}	
 }

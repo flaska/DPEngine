@@ -11,6 +11,7 @@
 class CWidget;
 class CWorkspace;
 class CWidget;
+class CPlanarWorkspace;
 
 class CWorkspaceExplorer:public QObject, public CObject
 {
@@ -40,6 +41,7 @@ public:
 	void mousePressEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 	void mouseDoubleClickEvent(QMouseEvent *event);
+	CPlanarWorkspace* iPlanarWorkspace;
 public slots:
 	void Scrolled(int value);
 private:
@@ -50,5 +52,7 @@ private:
 	TMouseState iMouseState;
 	TGLIcon iMoveIcon;
 	TGLIcon iResizeIcon;
+
+
 };
 #endif

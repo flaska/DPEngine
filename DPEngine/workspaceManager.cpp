@@ -104,6 +104,7 @@ void CWorkspaceManager::CreatePlanarWorkspace(CPlanarWorkspace *workspace){
 	if(!CWorkspaceExplorer::GetInstance())
 	return;
 	iPlanarWorkspace = workspace;
+
 }
 
 

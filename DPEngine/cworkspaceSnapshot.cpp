@@ -3,6 +3,7 @@
 #include <workspaceManager.h>
 #include <cworkspaceexplorer.h>
 #include <settings.h>
+#include <cplanarworkspace.h>
 
 //workspace snapshot
 CWorkspaceSnapshot::CWorkspaceSnapshot(CObject *parentWindow,CWorkspace *workspace, const QPointF &pos, const QPointF &size):CObject(parentWindow,pos,size)
@@ -30,8 +31,7 @@ void CWorkspaceSnapshot::initialize()
 {
 }
 
-void CWorkspaceSnapshot::paint(QPainter* painter)
-{ 
+void CWorkspaceSnapshot::paint(QPainter* painter) { 
 	DrawBorderRect(painter);
 	DrawInnerRect(painter);
 	int ypos= CWidget::GetInstance()->GetSize().y()-iSize.y()-iPosition.y()+GetBorders().bottom;
@@ -39,8 +39,19 @@ void CWorkspaceSnapshot::paint(QPainter* painter)
 	iWorkspace->paint(painter,snapshotPosition);
 	DrawIcons(painter); //*/
 	if(CWorkspaceManager::GetInstance()->GetActiveWorkspace()==iWorkspace) DrawSelection(painter);
+}
+
+void CWorkspaceSnapshot::paintMPR(QPainter* painter) { 
+	DrawBorderRect(painter);
+	DrawInnerRect(painter);
+	int ypos= CWidget::GetInstance()->GetSize().y()-iSize.y()-iPosition.y()+GetBorders().bottom;
+	QRect snapshotPosition(iPosition.x()+GetBorders().left, /*-ypos*/ iPosition.y(), iSize.x()-GetBorders().left-GetBorders().right, iSize.y()-GetBorders().top-GetBorders().bottom);
+		CWorkspaceExplorer::GetInstance()->iPlanarWorkspace->paint(painter,snapshotPosition);
+	DrawIcons(painter);
+	if(CWorkspaceManager::GetInstance()->GetActiveWorkspace()==NULL) DrawSelection(painter);
 
 }
+
 void CWorkspaceSnapshot::mouseMoveEvent(QMouseEvent *event)
 {
 }
@@ -66,6 +77,18 @@ void CWorkspaceSnapshot::mousePressEvent(QMouseEvent *event)
 	}
 	CWorkspaceExplorer::GetInstance()->SelectWorkspace(&this->GetWorkspace());
 //	SelectWorkspace(obj);
+}
+void CWorkspaceSnapshot::mousePressEventMPR(QMouseEvent *event)
+{
+	int x=event->x() - iPosition.x();
+	int y = event->y()- iPosition.y();
+	if(IsOnCloseIcon(x, y))
+	{
+		CloseMe();
+		return;
+
+	}
+	CWorkspaceExplorer::GetInstance()->SelectPlanarWorkspace();
 }
 void CWorkspaceSnapshot::mouseReleaseEvent(QMouseEvent *e)
 {

@@ -69,8 +69,12 @@ public:
 	void SetTextDisplay(TDiplayText displayText, bool on);
 	void save(QString& filename);
 	void SetOrientation(TImageAxisOrientation orientation);
-	quint8* dicomrawdata8bitCopy;
-	quint8* dicomrawdata8bitCopy2;
+	quint8* iImageTextureCoronal;
+	quint8* iImageTextureSaggital;
+	quint8* iImageTextureAxial;
+	quint8* iImageTextureSaggitalInterpolated;
+	quint8* iImageTextureCoronalInterpolated;
+	int iInterpolation;
 
 //private:
 	void MoveToDepth(float inDepthPosition);
@@ -106,5 +110,6 @@ public:
 	void PrepareSlice();
 	void PrepareImageCrop();
 	TGLIcon iFrameSlider;
+	QLabel myLabel;
 };
 #endif

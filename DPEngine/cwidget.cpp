@@ -72,7 +72,7 @@ void CWidget::SetGeometry(int x, int y, int w, int h)
 
 	QPoint workspaceExplorerPos(0,this->height()-Settings::imageExplorerSize);
 	QPoint workspaceExplorerSize(this->width(),this->height()-workspaceExplorerPos.y());
-	iWorkspaceExplorer->SetGeometry(workspaceExplorerPos.x(),workspaceExplorerPos.y(),workspaceExplorerSize.x(),workspaceExplorerSize.y());;
+	iWorkspaceExplorer->SetGeometry(workspaceExplorerPos.x(),workspaceExplorerPos.y(),workspaceExplorerSize.x(),workspaceExplorerSize.y());
 
 	QPoint workspacePos(0,0);
 	QPoint workspaceSize(this->width()-Settings::imageExplorerSize,this->height()-Settings::imageExplorerSize);

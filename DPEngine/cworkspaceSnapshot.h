@@ -14,10 +14,12 @@ public:
 	CWorkspace& GetWorkspace();
 	void initialize();
 	void paint(QPainter*);
+	void paintMPR(QPainter*);
 	void mouseMoveEvent(QMouseEvent *event);
 	void CloseMe();
 	void wheelEvent(QWheelEvent *event);	
 	void mousePressEvent(QMouseEvent *event);
+	void mousePressEventMPR(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *e);
 	void mouseDoubleClickEvent(QMouseEvent *event);
 private:
